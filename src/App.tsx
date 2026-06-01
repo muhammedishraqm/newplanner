@@ -418,6 +418,67 @@ export default function App() {
       localStorage.setItem('kairos_sample_wiped', 'true');
     }
 
+    // Seed tasks from Day 1 (1-6-2026) to Day 11
+    const isTasksSeeded = localStorage.getItem('kairos_tasks_seeded_v1');
+    if (!isTasksSeeded) {
+      const seededTasks: DailyTask[] = [
+        // Day 1: 2026-06-01
+        { id: 'task_seed_1_1', name: 'Finance', hours: 2, completed: false, date: '2026-06-01', createdAt: new Date('2026-06-01T09:00:00Z').toISOString() },
+        
+        // Day 2: 2026-06-02
+        { id: 'task_seed_2_1', name: 'OOPS', hours: 2, completed: false, date: '2026-06-02', createdAt: new Date('2026-06-02T09:00:00Z').toISOString() },
+        { id: 'task_seed_2_2', name: 'Oops YT', hours: 2.5, completed: false, date: '2026-06-02', createdAt: new Date('2026-06-02T11:00:00Z').toISOString() },
+        { id: 'task_seed_2_3', name: 'Py balance', hours: 2, completed: false, date: '2026-06-02', createdAt: new Date('2026-06-02T13:30:00Z').toISOString() },
+        
+        // Day 3: 2026-06-03
+        { id: 'task_seed_3_1', name: 'Py etc', hours: 2, completed: false, date: '2026-06-03', createdAt: new Date('2026-06-03T09:00:00Z').toISOString() },
+        { id: 'task_seed_3_2', name: 'YT projects', hours: 2.5, completed: false, date: '2026-06-03', createdAt: new Date('2026-06-03T11:00:00Z').toISOString() },
+        { id: 'task_seed_3_3', name: '21 project py 3hr', hours: 3, completed: false, date: '2026-06-03', createdAt: new Date('2026-06-03T13:30:00Z').toISOString() },
+        
+        // Day 4: 2026-06-04
+        { id: 'task_seed_4_1', name: '21 project py 5', hours: 5, completed: false, date: '2026-06-04', createdAt: new Date('2026-06-04T09:00:00Z').toISOString() },
+        { id: 'task_seed_4_2', name: '21 project py balance', hours: 2.5, completed: false, date: '2026-06-04', createdAt: new Date('2026-06-04T14:00:00Z').toISOString() },
+        
+        // Day 5: 2026-06-05
+        { id: 'task_seed_5_1', name: 'IITM PY 1-4', hours: 2.5, completed: false, date: '2026-06-05', createdAt: new Date('2026-06-05T09:00:00Z').toISOString() },
+        { id: 'task_seed_5_2', name: 'IITM PY 5-8', hours: 2.5, completed: false, date: '2026-06-05', createdAt: new Date('2026-06-05T11:30:00Z').toISOString() },
+        { id: 'task_seed_5_3', name: 'Py YT', hours: 2, completed: false, date: '2026-06-05', createdAt: new Date('2026-06-05T14:00:00Z').toISOString() },
+        
+        // Day 6: 2026-06-06
+        { id: 'task_seed_6_1', name: 'IITM PY 1-8', hours: 4, completed: false, date: '2026-06-06', createdAt: new Date('2026-06-06T09:00:00Z').toISOString() },
+        { id: 'task_seed_6_2', name: 'Etc', hours: 2, completed: false, date: '2026-06-06', createdAt: new Date('2026-06-06T13:00:00Z').toISOString() },
+        
+        // Day 7: 2026-06-07
+        { id: 'task_seed_7_1', name: 'IITM S', hours: 4, completed: false, date: '2026-06-07', createdAt: new Date('2026-06-07T09:00:00Z').toISOString() },
+        
+        // Day 8: 2026-06-08
+        { id: 'task_seed_8_1', name: 'IITM M', hours: 4, completed: false, date: '2026-06-08', createdAt: new Date('2026-06-08T09:00:00Z').toISOString() },
+        
+        // Day 9: 2026-06-09
+        { id: 'task_seed_9_1', name: 'IITM REV', hours: 4, completed: false, date: '2026-06-09', createdAt: new Date('2026-06-09T09:00:00Z').toISOString() },
+        
+        // Day 10: 2026-06-10
+        { id: 'task_seed_10_1', name: 'CS50 AI', hours: 4, completed: false, date: '2026-06-10', createdAt: new Date('2026-06-10T09:00:00Z').toISOString() },
+        
+        // Day 11: 2026-06-11
+        { id: 'task_seed_11_1', name: 'KATA', hours: 3, completed: false, date: '2026-06-11', createdAt: new Date('2026-06-11T09:00:00Z').toISOString() }
+      ];
+
+      const cached = localStorage.getItem('kairos_daily_tasks');
+      let currentTasks: DailyTask[] = [];
+      if (cached) {
+        try {
+          currentTasks = JSON.parse(cached);
+        } catch (e) {}
+      }
+
+      // Merge seeded tasks into the local storage (avoiding duplicate seed IDs)
+      const seedIds = new Set(seededTasks.map(t => t.id));
+      const filteredCurrent = currentTasks.filter(t => !seedIds.has(t.id));
+      localStorage.setItem('kairos_daily_tasks', JSON.stringify([...seededTasks, ...filteredCurrent]));
+      localStorage.setItem('kairos_tasks_seeded_v1', 'true');
+    }
+
     const cachedHabits = localStorage.getItem('kairos_habits');
     const cachedStudy = localStorage.getItem('kairos_study');
     const cachedDailyTasks = localStorage.getItem('kairos_daily_tasks');
@@ -843,11 +904,34 @@ export default function App() {
               ========================================== */}
           {activeTab === 'dashboard' && (
             <div>
-              <div style={{ marginBottom: '24px' }}>
-                <p className="serif-font" style={{ fontSize: '1.2rem', fontStyle: 'italic', color: 'var(--accent-primary)', marginBottom: '4px' }}>
-                  {getGreeting()}
-                </p>
-                <h1 className="section-title" style={{ fontSize: '2.2rem' }}>{getSelectedDateDisplay()}</h1>
+              <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '12px' }}>
+                <div>
+                  <p className="serif-font" style={{ fontSize: '1.2rem', fontStyle: 'italic', color: 'var(--accent-primary)', marginBottom: '4px' }}>
+                    {getGreeting()}
+                  </p>
+                  <h1 className="section-title" style={{ fontSize: '2.2rem', margin: 0 }}>{getSelectedDateDisplay()}</h1>
+                </div>
+                <div>
+                  <input 
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => e.target.value && setSelectedDate(e.target.value)}
+                    style={{
+                      padding: '8px 12px',
+                      borderRadius: '12px',
+                      border: '1px solid var(--border-color)',
+                      backgroundColor: 'var(--bg-card)',
+                      color: 'var(--text-primary)',
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: '0.85rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
+                      outline: 'none',
+                      transition: 'all 0.2s ease',
+                    }}
+                  />
+                </div>
               </div>
 
               {/* iPhone Safari Onboarding Tooltip */}
@@ -1264,6 +1348,13 @@ export default function App() {
                                   key={day.dateStr}
                                   className={`contribution-cell ${intensityClass} ${day.isFuture ? 'is-future' : ''}`}
                                   title={`${day.dateStr}: ${tooltip}`}
+                                  onClick={() => {
+                                    if (!day.isFuture) {
+                                      setSelectedDate(day.dateStr);
+                                      setActiveTab('dashboard');
+                                    }
+                                  }}
+                                  style={{ cursor: day.isFuture ? 'default' : 'pointer' }}
                                 />
                               );
                             })}
@@ -1324,6 +1415,13 @@ export default function App() {
                                   key={day.dateStr}
                                   className={`contribution-cell ${cellClass} ${day.isFuture ? 'is-future' : ''}`}
                                   title={`${day.dateStr}: ${tooltip}`}
+                                  onClick={() => {
+                                    if (!day.isFuture) {
+                                      setSelectedDate(day.dateStr);
+                                      setActiveTab('dashboard');
+                                    }
+                                  }}
+                                  style={{ cursor: day.isFuture ? 'default' : 'pointer' }}
                                 />
                               );
                             })}
@@ -1335,9 +1433,17 @@ export default function App() {
 
                   {/* Sleep Logging Action Row */}
                   <div style={{ borderTop: '1px solid var(--border-color-light)', paddingTop: '14px' }}>
-                    <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                      Log sleep duration for {getSelectedDateDisplay()}:
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                      <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                        Log sleep duration for:
+                      </span>
+                      <input 
+                        type="date" 
+                        value={selectedDate}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                        style={{ padding: '4px', borderRadius: '4px', border: '1px solid var(--border-color)', fontSize: '0.8rem' }}
+                      />
+                    </div>
                     <div style={{ display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
                       {[7, 8, 9, 10].map((hours) => {
                         const isSelected = sleepLogs[selectedDate] === hours;
@@ -1419,13 +1525,20 @@ export default function App() {
                                         const cellClass = isCompleted ? 'completed-coral' : '';
                                         const tooltip = isCompleted ? 'Completed' : 'Not completed';
 
-                                        return (
-                                          <div 
-                                            key={day.dateStr}
-                                            className={`contribution-cell ${cellClass} ${day.isFuture ? 'is-future' : ''}`}
-                                            title={`${day.dateStr}: ${tooltip}`}
-                                          />
-                                        );
+                                          return (
+                                            <div 
+                                              key={day.dateStr}
+                                              className={`contribution-cell ${cellClass} ${day.isFuture ? 'is-future' : ''}`}
+                                              title={`${day.dateStr}: ${tooltip}`}
+                                              onClick={() => {
+                                                if (!day.isFuture) {
+                                                  setSelectedDate(day.dateStr);
+                                                  setActiveTab('dashboard');
+                                                }
+                                              }}
+                                              style={{ cursor: day.isFuture ? 'default' : 'pointer' }}
+                                            />
+                                          );
                                       })}
                                     </div>
                                   ))}
