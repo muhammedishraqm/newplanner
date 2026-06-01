@@ -61,6 +61,7 @@ interface DailyTask {
   name: string;
   hours: number;
   completed: boolean;
+  date?: string; // YYYY-MM-DD
   createdAt: string;
 }
 
@@ -158,7 +159,7 @@ interface ScheduleItem {
   endTimeDec: number;
 }
 
-const generateSchedule = (tasks: DailyTask[], habits: Habit[]): ScheduleItem[] => {
+const generateSchedule = (tasks: DailyTask[], habits: Habit[], selectedDate: string): ScheduleItem[] => {
   const schedule: ScheduleItem[] = [];
   let currentHour = 9.0; // Start at 9:00 AM
   
@@ -184,14 +185,7 @@ const generateSchedule = (tasks: DailyTask[], habits: Habit[]): ScheduleItem[] =
     endTimeDec: 8.0
   });
 
-  // Calculate today's YYYY-MM-DD
-  const todayObj = new Date();
-  const yyyy = todayObj.getFullYear();
-  const mm = String(todayObj.getMonth() + 1).padStart(2, '0');
-  const dd = String(todayObj.getDate()).padStart(2, '0');
-  const todayStr = `${yyyy}-${mm}-${dd}`;
-
-  const activeHabitsToday = habits.filter(h => !h.history.includes(todayStr)).map(h => h.name).join(', ');
+  const activeHabitsToday = habits.filter(h => !h.history.includes(selectedDate)).map(h => h.name).join(', ');
   schedule.push({
     id: 'morning_habits',
     title: 'Morning Practice Rituals',
@@ -358,6 +352,7 @@ const generateSchedule = (tasks: DailyTask[], habits: Habit[]): ScheduleItem[] =
 export default function App() {
   // Navigation & UI States
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
+  const [selectedDate, setSelectedDate] = useState<string>(getTodayString());
   const [pwaDismissed, setPwaDismissed] = useState<boolean>(false);
   
   // Core Data States
@@ -408,9 +403,9 @@ export default function App() {
       setDailyTasks(JSON.parse(cachedDailyTasks));
     } else {
       const seededTasks: DailyTask[] = [
-        { id: 'dt1', name: 'Machine Learning Coding', hours: 2, completed: false, createdAt: new Date().toISOString() },
-        { id: 'dt2', name: 'Systems Research Notes', hours: 3, completed: false, createdAt: new Date().toISOString() },
-        { id: 'dt3', name: 'Responsive Web Layouts', hours: 5, completed: false, createdAt: new Date().toISOString() }
+        { id: 'dt1', name: 'Machine Learning Coding', hours: 2, completed: false, date: getTodayString(), createdAt: new Date().toISOString() },
+        { id: 'dt2', name: 'Systems Research Notes', hours: 3, completed: false, date: getTodayString(), createdAt: new Date().toISOString() },
+        { id: 'dt3', name: 'Responsive Web Layouts', hours: 5, completed: false, date: getTodayString(), createdAt: new Date().toISOString() }
       ];
       setDailyTasks(seededTasks);
       localStorage.setItem('kairos_daily_tasks', JSON.stringify(seededTasks));
@@ -660,6 +655,7 @@ export default function App() {
       name: quickTaskName.trim(),
       hours,
       completed: false,
+      date: selectedDate,
       createdAt: new Date().toISOString()
     };
     const updated = [newTask, ...dailyTasks];
@@ -858,6 +854,23 @@ export default function App() {
     if (hour >= 12 && hour < 17) return 'Good afternoon, Builder.';
     if (hour >= 17 && hour < 21) return 'Good evening, Thinker.';
     return 'Rest well, Dreamer.';
+  };
+
+  // Selected date display format
+  const getSelectedDateDisplay = () => {
+    const parts = selectedDate.split('-');
+    if (parts.length === 3) {
+      const year = parseInt(parts[0]);
+      const month = parseInt(parts[1]) - 1;
+      const day = parseInt(parts[2]);
+      const d = new Date(year, month, day);
+      return d.toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+    return displayTodayDate;
   };
 
   // 1. Dashboard computations
@@ -1138,7 +1151,7 @@ export default function App() {
                 <p className="serif-font" style={{ fontSize: '1.2rem', fontStyle: 'italic', color: 'var(--accent-primary)', marginBottom: '4px' }}>
                   {getGreeting()}
                 </p>
-                <h1 className="section-title" style={{ fontSize: '2.2rem' }}>{displayTodayDate}</h1>
+                <h1 className="section-title" style={{ fontSize: '2.2rem' }}>{getSelectedDateDisplay()}</h1>
               </div>
 
               {/* iPhone Safari Onboarding Tooltip */}
@@ -1176,7 +1189,8 @@ export default function App() {
                 {weekDates.map((day, idx) => (
                   <div 
                     key={idx} 
-                    className={`calendar-week-day ${day.isToday ? 'active' : ''}`}
+                    className={`calendar-week-day ${selectedDate === day.dateStr ? 'active' : ''}`}
+                    onClick={() => setSelectedDate(day.dateStr)}
                   >
                     <span className="calendar-week-day-name">{day.label.slice(0, 3)}</span>
                     <span className="calendar-week-day-num">{day.dayNum}</span>
@@ -1224,7 +1238,7 @@ export default function App() {
               {/* Pathway Vertical daily schedule timeline */}
               <div className="timeline-container">
                 <div className="timeline-track-line" />
-                {generateSchedule(dailyTasks, habits).map((item) => {
+                {generateSchedule(dailyTasks.filter(t => (t.date || getTodayString()) === selectedDate), habits, selectedDate).map((item) => {
                   const today = new Date();
                   const currentDecHour = today.getHours() + today.getMinutes() / 60;
                   const isCurrentTime = currentDecHour >= item.startTimeDec && currentDecHour < item.endTimeDec;
