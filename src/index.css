@@ -1,0 +1,1267 @@
+/* 
+  KAIROS — Design System & Styles (Light Editorial Journal Theme)
+  Inspired by high-end design studio card stacks.
+  Color Palette:
+    - Paper: #F6F4F1 (Off-white canvas)
+    - Stone: #E4DED2 (Warm light gray)
+    - Coral: #F95C4B (Vibrant accent red)
+    - Black: #000000 (True high-contrast black)
+*/
+
+:root {
+  /* Color System */
+  --bg-base: #F6F4F1;         /* Paper Canvas */
+  --bg-surface: #E4DED2;      /* Warm Stone */
+  --bg-surface-hover: #D8D1C4; /* Darker Stone */
+  --bg-card: #FFFFFF;         /* Pure White Cards */
+  
+  --border-color: #D8D1C4;
+  --border-color-light: #E4DED2;
+  
+  --text-primary: #000000;    /* True Black for Editorial Contrast */
+  --text-secondary: #2C2A29;  /* Deep Charcoal */
+  --text-muted: #797572;      /* Medium Soft Gray */
+  
+  /* Curated Theme Accent Colors mapped from default data types */
+  --accent-primary: #F95C4B;  /* Coral Red */
+  --accent-coral: #F95C4B;
+  --accent-stone: #E4DED2;
+  --accent-paper: #F6F4F1;
+  --accent-black: #000000;
+  
+  /* Standard Seed State Accent Mappings */
+  --accent-sage: #F95C4B;       /* Map to Coral */
+  --accent-terracotta: #000000; /* Map to Black */
+  --accent-slate: #F95C4B;      /* Map to Coral */
+  --accent-rose: #000000;       /* Map to Black */
+  --accent-purple: #F95C4B;     /* Map to Coral */
+  
+  /* Font Families */
+  --font-serif: 'Fraunces', Georgia, Cambria, serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  
+  /* Safe Area Offsets for iOS standalone PWA */
+  --safe-top: env(safe-area-inset-top, 20px);
+  --safe-bottom: env(safe-area-inset-bottom, 16px);
+  
+  /* Transitions */
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base resets */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  overflow: hidden;
+  position: fixed;
+}
+
+/* Typography */
+h1, h2, h3, h4, .serif-font {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+p {
+  color: var(--text-secondary);
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+/* App Shell Structure */
+.app-container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bg-base);
+}
+
+/* iOS Translucent Glass Header */
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(56px + var(--safe-top));
+  padding-top: var(--safe-top);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 20px;
+  padding-right: 20px;
+  background-color: hsla(36, 15%, 95%, 0.85); /* Translucent Paper */
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border-bottom: 1px solid var(--border-color);
+  z-index: 100;
+}
+
+.app-header h1 {
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+  font-style: italic;
+  font-weight: 500;
+}
+
+.header-accent-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--accent-primary);
+  margin-left: 4px;
+  box-shadow: 0 0 8px var(--accent-primary);
+}
+
+/* Navigation Shell - Sidebar (Desktop) */
+.app-sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 260px;
+  height: 100%;
+  background-color: var(--bg-surface); /* Warm Stone */
+  border-right: 1px solid var(--border-color);
+  padding: 40px 24px var(--safe-bottom) 24px;
+  flex-shrink: 0;
+  z-index: 110;
+}
+
+.sidebar-logo {
+  font-family: var(--font-serif);
+  font-size: 2.2rem;
+  font-weight: 700;
+  font-style: italic;
+  margin-bottom: 40px;
+  padding-left: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-logo span {
+  color: var(--accent-primary);
+  font-size: 2.5rem;
+  line-height: 0;
+  margin-left: 2px;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-grow: 1;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-fast);
+  font-weight: 500;
+}
+
+.nav-item:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-surface-hover);
+}
+
+.nav-item.active {
+  color: #FFFFFF;
+  background-color: var(--accent-black); /* High contrast black active links */
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.sidebar-footer {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  padding-left: 12px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Main Content Area */
+.main-viewport {
+  flex-grow: 1;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: calc(72px + var(--safe-top)) 24px calc(24px + var(--safe-bottom)) 24px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Grid & Layout Utilities */
+.container-narrow {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+}
+
+.section-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: 24px;
+}
+
+/* Cards Design - Minimalist light paper card */
+.card {
+  background-color: var(--bg-card); /* Pure White */
+  border: 1px solid var(--border-color-light);
+  border-radius: 20px; /* Matching corner roundness */
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03); /* Soft elegant shadows */
+  transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.card:hover {
+  border-color: var(--border-color);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+  font-size: 1.25rem;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+/* Floating Action Button (Vibrant Coral) */
+.fab {
+  position: fixed;
+  bottom: calc(24px + var(--safe-bottom));
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 28px;
+  background-color: var(--accent-primary); /* Coral */
+  color: #FFFFFF;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(249, 92, 75, 0.35);
+  cursor: pointer;
+  z-index: 90;
+  transition: transform var(--transition-fast), background-color var(--transition-fast);
+}
+
+.fab:active {
+  transform: scale(0.92);
+}
+
+/* Form elements (High contrast stone fields) */
+.input-group {
+  margin-bottom: 16px;
+}
+
+.input-label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.input-field, .select-field, .textarea-field {
+  width: 100%;
+  background-color: var(--bg-base); /* Paper input field */
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: var(--text-primary);
+  outline: none;
+  font-size: 0.95rem;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.input-field:focus, .select-field:focus, .textarea-field:focus {
+  border-color: var(--accent-primary);
+  background-color: #FFFFFF;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition-fast);
+  font-size: 0.95rem;
+}
+
+.btn-primary {
+  background-color: var(--accent-black); /* Primary CTA is high-contrast Black */
+  color: #FFFFFF;
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+  background-color: #1a1a1a;
+}
+
+.btn-secondary {
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--bg-surface-hover);
+}
+
+.btn-danger {
+  background-color: rgba(249, 92, 75, 0.1);
+  color: var(--accent-primary);
+}
+
+.btn-danger:hover {
+  background-color: rgba(249, 92, 75, 0.18);
+}
+
+/* Modals Bottom Sheet */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 200;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.modal-content {
+  background-color: #FFFFFF;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 24px 24px 0 0;
+  padding: 24px 24px calc(24px + var(--safe-bottom)) 24px;
+  border-top: 1px solid var(--border-color);
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-header h3 {
+  font-size: 1.4rem;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* ==========================================
+    THE CORAL & BLACK STACKED FOCUS LIST (Habits)
+    Mimics the user's custom aesthetic exactly!
+   ========================================== */
+.habit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 10px 4px;
+}
+
+/* Custom piled focus card list items with organic slight tilts */
+.habit-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background-color: #FFFFFF; /* Paper/White cards */
+  border: 1px solid var(--border-color);
+  border-radius: 20px; /* Rounded pill card shape */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  transition: transform var(--transition-fast), 
+              box-shadow var(--transition-fast), 
+              background-color var(--transition-normal), 
+              border-color var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Checked states turns card to dynamic accents (Coral / Black) with White text */
+/* Even items toggle to Coral, Odd items toggle to true Black */
+.habit-item.checked-coral {
+  background-color: #F95C4B !important; /* Coral */
+  border-color: #F95C4B !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 6px 16px rgba(249, 92, 75, 0.25);
+}
+
+.habit-item.checked-black {
+  background-color: #000000 !important; /* Black */
+  border-color: #000000 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Make text inside checked state white */
+.habit-item.checked-coral h4, 
+.habit-item.checked-coral p, 
+.habit-item.checked-coral span,
+.habit-item.checked-black h4, 
+.habit-item.checked-black p, 
+.habit-item.checked-black span {
+  color: #FFFFFF !important;
+}
+
+/* Apply rotational tilts to cards to match the physical paper layout */
+.habit-item:nth-child(4n+1) {
+  transform: rotate(-1deg);
+}
+.habit-item:nth-child(4n+2) {
+  transform: rotate(1.2deg);
+}
+.habit-item:nth-child(4n+3) {
+  transform: rotate(-1.5deg);
+}
+.habit-item:nth-child(4n+4) {
+  transform: rotate(0.8deg);
+}
+
+/* Reset rotation on hover to simulate interactive card focus */
+.habit-item:hover {
+  transform: translateY(-3px) scale(1.02) rotate(0deg) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border-color: var(--text-primary);
+  z-index: 10;
+}
+
+.habit-item:active {
+  transform: scale(0.97) !important;
+}
+
+.habit-item-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.habit-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  background-color: var(--bg-surface);
+  transition: background-color var(--transition-fast);
+}
+
+.habit-item.checked-coral .habit-icon-wrap,
+.habit-item.checked-black .habit-icon-wrap {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.habit-info h4 {
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.habit-info p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.habit-streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.habit-item.checked-coral .habit-streak,
+.habit-item.checked-black .habit-streak {
+  background-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+/* Custom interactive pill checkbox */
+.habit-checkbox {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 2px solid var(--border-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  color: transparent;
+  background-color: transparent;
+}
+
+.habit-checkbox.checked {
+  border-color: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+  transform: scale(1.08);
+}
+
+.habit-item.checked-coral .habit-checkbox.checked svg {
+  color: #F95C4B !important; /* Checked inside Coral card is Coral */
+}
+
+.habit-item.checked-black .habit-checkbox.checked svg {
+  color: #000000 !important; /* Checked inside Black card is Black */
+}
+
+.preset-btn {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.preset-btn:hover {
+  border-color: var(--accent-primary);
+  background-color: #FFFFFF;
+}
+
+/* Today's completion circular progress gauge */
+.progress-ring-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background-color: #FFFFFF;
+  border: 1px solid var(--border-color-light);
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+}
+
+.progress-ring-wrap {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.progress-ring-circle {
+  transition: stroke-dashoffset 0.35s;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+.progress-ring-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.progress-ring-info h3 {
+  font-size: 1.3rem;
+  margin-bottom: 4px;
+}
+
+.progress-ring-info p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* Study Planner specific styles */
+.study-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.study-item {
+  padding: 16px;
+  background-color: var(--bg-base);
+  border: 1px solid var(--border-color-light);
+  border-radius: 14px;
+}
+
+.study-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.study-subject {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.study-topic {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.study-details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 10px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.study-stats {
+  display: flex;
+  gap: 12px;
+}
+
+/* Study SVG Bar Chart Component */
+.study-chart-card {
+  margin-bottom: 24px;
+}
+
+.study-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 140px;
+  padding-top: 10px;
+  margin-top: 20px;
+  position: relative;
+}
+
+.study-chart-bar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-grow: 1;
+  height: 100%;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.study-chart-bar-container {
+  width: 24px;
+  height: 100px;
+  background-color: var(--bg-surface);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+}
+
+.study-chart-bar {
+  width: 100%;
+  border-radius: 8px;
+  background-color: var(--accent-primary); /* Coral */
+  transition: height 0.5s ease-out;
+  min-height: 2px;
+}
+
+.study-chart-bar.today {
+  background-color: var(--text-primary); /* Today is deep high-contrast Black */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+}
+
+.study-chart-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.study-chart-val {
+  font-size: 0.75rem;
+  color: var(--text-primary);
+  font-weight: 700;
+  position: absolute;
+  top: -18px;
+}
+
+/* Goals & To-Dos */
+.goal-filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.goal-filter-btn {
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  border: 1px solid var(--border-color);
+  background-color: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+
+.goal-filter-btn.active {
+  background-color: var(--accent-black);
+  color: #FFFFFF;
+  border-color: var(--accent-black);
+}
+
+.goal-item {
+  background-color: #FFFFFF;
+  border: 1px solid var(--border-color-light);
+  border-radius: 20px;
+  padding: 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+  transition: all var(--transition-fast);
+}
+
+.goal-item:hover {
+  border-color: var(--border-color);
+}
+
+.goal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.goal-title-area {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.goal-title {
+  font-family: var(--font-sans);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.goal-date {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.tag {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* Map priority tags to Coral and Black */
+.tag-high {
+  background-color: rgba(249, 92, 75, 0.12);
+  color: var(--accent-primary); /* Coral */
+}
+
+.tag-medium {
+  background-color: rgba(0, 0, 0, 0.08);
+  color: var(--text-primary); /* Black */
+}
+
+.tag-low {
+  background-color: var(--bg-surface);
+  color: var(--text-secondary); /* Stone */
+}
+
+/* Goals linear progress bar */
+.goal-progress-wrap {
+  margin: 14px 0;
+}
+
+.goal-progress-bar {
+  height: 6px;
+  width: 100%;
+  background-color: var(--bg-surface);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.goal-progress-fill {
+  height: 100%;
+  background-color: var(--accent-primary); /* Coral progress fill */
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.goal-progress-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+/* Subtasks inside Goals */
+.subtasks-title {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-top: 16px;
+  margin-bottom: 8px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.subtasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.subtask-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  background-color: var(--bg-base);
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color-light);
+}
+
+.subtask-checkbox {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  border: 1.5px solid var(--border-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  color: transparent;
+  flex-shrink: 0;
+}
+
+.subtask-checkbox.checked {
+  border-color: var(--accent-black);
+  background-color: var(--accent-black);
+  color: #FFFFFF;
+}
+
+.subtask-text.checked {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+/* Safari Add to Home Screen Onboarding Card (Coral style) */
+.pwa-onboarding {
+  background: linear-gradient(135deg, rgba(249, 92, 75, 0.08) 0%, rgba(228, 222, 210, 0.2) 100%);
+  border: 2px solid var(--accent-primary);
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 24px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pwa-onboarding h4 {
+  font-size: 1.1rem;
+  color: var(--accent-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pwa-onboarding p {
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.pwa-onboarding-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.pwa-onboarding-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pwa-onboarding-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #FFFFFF;
+  border-radius: 8px;
+  padding: 6px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+}
+
+.pwa-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+/* Empty State Widget */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+}
+
+.empty-state svg {
+  margin-bottom: 16px;
+  color: var(--border-color);
+}
+
+.empty-state p {
+  font-size: 0.85rem;
+  max-width: 240px;
+  margin-top: 4px;
+}
+
+/* Keyframe Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* Responsive Viewports */
+@media (max-width: 767.98px) {
+  .app-container {
+    flex-direction: column;
+  }
+  
+  .app-sidebar {
+    display: none;
+  }
+  
+  /* Fixed translucent glass bottom dock on iPhone Safari */
+  .app-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: calc(64px + var(--safe-bottom));
+    background-color: rgba(246, 244, 241, 0.85); /* Translucent Paper */
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding-bottom: var(--safe-bottom);
+    z-index: 120;
+  }
+  
+  .bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    flex-grow: 1;
+    height: 100%;
+    cursor: pointer;
+    font-size: 0.65rem;
+    font-weight: 600;
+    transition: color var(--transition-fast);
+  }
+  
+  .bottom-nav-item.active {
+    color: var(--text-primary); /* Active bottom tab is high-contrast Black */
+  }
+  
+  .main-viewport {
+    padding: calc(64px + var(--safe-top)) 16px calc(76px + var(--safe-bottom)) 16px;
+    height: 100vh;
+  }
+  
+  .fab {
+    bottom: calc(80px + var(--safe-bottom));
+    right: 16px;
+  }
+  
+  .section-title {
+    font-size: 1.6rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .app-bottom-nav {
+    display: none;
+  }
+  
+  .main-viewport {
+    padding: 48px 40px;
+    height: 100vh;
+  }
+  
+  .app-header {
+    display: none;
+  }
+}
+
+/* ==========================================
+   PATHWAY DAILY TIMELINE SYSTEM
+   ========================================== */
+.timeline-container {
+  position: relative;
+  padding-left: 36px; /* space for track */
+  margin-top: 24px;
+}
+
+.timeline-track-line {
+  position: absolute;
+  left: 10px;
+  top: 16px;
+  bottom: 16px;
+  width: 3px;
+  background-color: var(--border-color);
+  border-radius: 2px;
+}
+
+.timeline-item-wrap {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.timeline-node {
+  position: absolute;
+  left: 10px; /* aligns to left of item-wrap */
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 3px solid var(--border-color);
+  background-color: var(--bg-base);
+  transform: translate(-50%, 14px); /* center on the 3px line */
+  z-index: 5;
+  transition: all var(--transition-fast);
+}
+
+.timeline-node.completed {
+  border-color: #F95C4B;
+  background-color: #F95C4B;
+}
+
+.timeline-node.active {
+  width: 22px;
+  height: 22px;
+  border: 4px solid #F95C4B;
+  background-color: var(--bg-base);
+  box-shadow: 0 0 10px rgba(249, 92, 75, 0.4);
+  transform: translate(-50%, 10px); /* adjust center due to larger size */
+}
+
+.timeline-card {
+  background-color: #FFFFFF;
+  border: 1px solid var(--border-color-light);
+  border-radius: 20px;
+  padding: 18px 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+  transition: all var(--transition-normal);
+  margin-left: 12px;
+}
+
+.timeline-card.active-coral {
+  background-color: #F95C4B !important; /* Coral */
+  border-color: #F95C4B !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 6px 18px rgba(249, 92, 75, 0.3);
+}
+
+.timeline-card.active-black {
+  background-color: #000000 !important; /* Black */
+  border-color: #000000 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+/* Force elements inside active cards to white */
+.timeline-card.active-coral h4,
+.timeline-card.active-coral p,
+.timeline-card.active-coral span,
+.timeline-card.active-black h4,
+.timeline-card.active-black p,
+.timeline-card.active-black span {
+  color: #FFFFFF !important;
+}
+
+/* Hover effect */
+.timeline-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
+  border-color: var(--border-color);
+}
+
+/* Compact style for repetitive routine gap cards */
+.timeline-card.is-gap-card {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 6px 16px !important;
+  margin-left: 12px;
+}
+
+.timeline-card.is-gap-card:hover {
+  background-color: rgba(0, 0, 0, 0.02) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.timeline-card.is-gap-card h4 {
+  font-family: var(--font-sans) !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+  color: var(--text-secondary) !important;
+}
+
+.timeline-card.is-gap-card p {
+  font-size: 0.78rem !important;
+  color: var(--text-muted) !important;
+}
+
+/* Smaller hollow circle for gap timeline nodes */
+.timeline-node.is-gap-node {
+  width: 10px !important;
+  height: 10px !important;
+  border: 2px solid var(--border-color) !important;
+  background-color: var(--bg-base) !important;
+  transform: translate(-50%, 12px) !important;
+  box-shadow: none !important;
+}
+
+.timeline-node.is-gap-node.active {
+  border-color: var(--accent-primary) !important;
+  background-color: #FFFFFF !important;
+  box-shadow: 0 0 6px rgba(249, 92, 75, 0.3) !important;
+}
+
+/* Horizontal Weekdays Calendar Bar */
+.calendar-week-bar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  background-color: #FFFFFF;
+  border: 1px solid var(--border-color-light);
+  border-radius: 20px;
+  padding: 14px 10px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.01);
+}
+
+.calendar-week-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  padding: 8px 4px;
+  border-radius: 14px;
+  transition: all var(--transition-fast);
+}
+
+.calendar-week-day.active {
+  background-color: #F95C4B; /* Highlighted today/selected day */
+  color: #FFFFFF;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(249, 92, 75, 0.25);
+}
+
+.calendar-week-day.active span {
+  color: #FFFFFF !important;
+}
+
+.calendar-week-day-name {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.calendar-week-day-num {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
