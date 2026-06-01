@@ -425,21 +425,64 @@ export default function App() {
     const cachedPwa = localStorage.getItem('kairos_pwa_dismissed');
 
     if (cachedDailyTasks) {
-      setDailyTasks(JSON.parse(cachedDailyTasks));
+      const parsed = JSON.parse(cachedDailyTasks);
+      const seenIds = new Set<string>();
+      const validated = parsed.map((t: any, idx: number) => {
+        let taskId = t.id;
+        if (!taskId || seenIds.has(taskId)) {
+          taskId = `task_dedup_${Date.now()}_${idx}_${Math.floor(Math.random() * 1000)}`;
+        }
+        seenIds.add(taskId);
+        return {
+          ...t,
+          id: taskId,
+          date: t.date || getTodayString()
+        };
+      });
+      setDailyTasks(validated);
+      localStorage.setItem('kairos_daily_tasks', JSON.stringify(validated));
     } else {
       setDailyTasks([]);
       localStorage.setItem('kairos_daily_tasks', JSON.stringify([]));
     }
 
     if (cachedHabits) {
-      setHabits(JSON.parse(cachedHabits));
+      const parsed = JSON.parse(cachedHabits);
+      const seenIds = new Set<string>();
+      const validated = parsed.map((h: any, idx: number) => {
+        let habitId = h.id;
+        if (!habitId || seenIds.has(habitId)) {
+          habitId = `habit_dedup_${Date.now()}_${idx}_${Math.floor(Math.random() * 1000)}`;
+        }
+        seenIds.add(habitId);
+        return {
+          ...h,
+          id: habitId
+        };
+      });
+      setHabits(validated);
+      localStorage.setItem('kairos_habits', JSON.stringify(validated));
     } else {
       setHabits([]);
       localStorage.setItem('kairos_habits', JSON.stringify([]));
     }
 
     if (cachedStudy) {
-      setStudySessions(JSON.parse(cachedStudy));
+      const parsed = JSON.parse(cachedStudy);
+      const seenIds = new Set<string>();
+      const validated = parsed.map((s: any, idx: number) => {
+        let studyId = s.id;
+        if (!studyId || seenIds.has(studyId)) {
+          studyId = `study_dedup_${Date.now()}_${idx}_${Math.floor(Math.random() * 1000)}`;
+        }
+        seenIds.add(studyId);
+        return {
+          ...s,
+          id: studyId
+        };
+      });
+      setStudySessions(validated);
+      localStorage.setItem('kairos_study', JSON.stringify(validated));
     } else {
       setStudySessions([]);
       localStorage.setItem('kairos_study', JSON.stringify([]));
@@ -520,7 +563,7 @@ export default function App() {
     if (!newHabitName.trim()) return;
 
     const newHabit: Habit = {
-      id: 'habit_' + Date.now(),
+      id: 'habit_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
       name: newHabitName.trim(),
       description: newHabitDesc.trim() || 'A positive daily routine',
       icon: newHabitIcon,
@@ -547,7 +590,7 @@ export default function App() {
     if (!quickTaskName.trim()) return;
     const hours = parseFloat(quickTaskHours) || 1;
     const newTask: DailyTask = {
-      id: 'task_' + Date.now(),
+      id: 'task_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
       name: quickTaskName.trim(),
       hours,
       completed: false,
@@ -562,6 +605,7 @@ export default function App() {
   };
 
   const handleToggleTaskCompleted = (id: string) => {
+    if (!id || id === 'undefined') return;
     const updated = dailyTasks.map(t => {
       if (t.id === id) return { ...t, completed: !t.completed };
       return t;
@@ -607,7 +651,7 @@ export default function App() {
     if (!newStudySubject.trim() || !newStudyTopic.trim()) return;
 
     const newSession: StudySession = {
-      id: 'study_' + Date.now(),
+      id: 'study_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
       subject: newStudySubject.trim(),
       topic: newStudyTopic.trim(),
       durationGoal: parseInt(newStudyDuration) || 60,
