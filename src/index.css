@@ -173,6 +173,7 @@ button, input, select, textarea {
   padding-left: 0;
   cursor: pointer;
   transition: all var(--transition-fast);
+  overflow: hidden;
 }
 
 .sidebar-logo:hover {
