@@ -135,17 +135,17 @@ button, input, select, textarea {
 /* Navigation Shell - Premium Floating Sidebar (Desktop) */
 .app-sidebar {
   position: fixed;
-  left: 20px;
-  top: 20px;
-  bottom: 20px;
-  width: 76px;
-  height: calc(100vh - 40px);
+  left: 24px;
+  top: 24px;
+  bottom: 24px;
+  width: 80px;
+  height: calc(100vh - 48px);
   background-color: rgba(246, 244, 241, 0.85); /* Cozy Translucent Sand */
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
   border: 1px solid rgba(228, 222, 210, 0.7);
   border-radius: 28px;
-  padding: 24px 12px;
+  padding: 32px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -163,8 +163,8 @@ button, input, select, textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background-color: #FFFFFF;
   border: 1px solid var(--border-color);
@@ -1067,48 +1067,65 @@ button, input, select, textarea {
 /* Responsive Viewports */
 @media (max-width: 767.98px) {
   .app-container {
-    flex-direction: row; /* Keep row direction for floating sidebar */
+    flex-direction: column; /* Normal layout flow on mobile */
   }
   
   .app-sidebar {
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    bottom: auto;
-    width: 60px;
-    height: auto;
-    padding: 16px 8px;
-    border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    position: fixed;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    bottom: 20px !important;
+    top: auto !important;
+    width: auto !important;
+    max-width: 90% !important;
+    height: 64px !important;
+    background-color: rgba(246, 244, 241, 0.85) !important; /* Translucent Sand */
+    backdrop-filter: blur(20px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
+    border: 1px solid rgba(228, 222, 210, 0.85) !important;
+    border-radius: 32px !important;
+    padding: 0 16px !important;
+    display: flex !important;
+    flex-direction: row !important; /* Horizontal alignment */
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 12px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+    z-index: 1000 !important;
   }
   
   .sidebar-logo {
-    display: none; /* Hide logo inside mobile side-dock */
+    display: none !important;
   }
   
   .sidebar-nav {
-    gap: 12px;
+    display: flex !important;
+    flex-direction: row !important; /* Horizontal lists */
+    align-items: center !important;
+    gap: 12px !important;
+    width: auto !important;
+    height: 100% !important;
   }
   
   .nav-item {
-    width: 42px;
-    height: 42px;
+    width: 44px !important;
+    height: 44px !important;
   }
   
   .nav-item::after {
-    display: none; /* Hide tooltips on mobile */
+    display: none !important;
   }
   
   .sidebar-footer {
-    display: none; /* Hide footer */
+    display: none !important;
   }
   
   .app-header {
-    padding-left: 84px !important;
+    padding-left: 20px !important; /* Balanced padding */
   }
   
   .main-viewport {
-    padding: calc(64px + var(--safe-top)) 16px 24px calc(84px + var(--safe-left)) !important;
+    padding: calc(64px + var(--safe-top)) 16px 100px 16px !important; /* Generous bottom padding to prevent covering content */
     height: 100vh;
   }
   
@@ -1117,12 +1134,12 @@ button, input, select, textarea {
   }
   
   .fab {
-    bottom: 24px;
+    bottom: 96px; /* Avoid overlapping the bottom dock */
     right: 16px;
   }
   
   .section-title {
-    font-size: 1.6rem;
+    font-size: 1.8rem;
   }
 }
 
