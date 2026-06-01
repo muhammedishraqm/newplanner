@@ -822,76 +822,50 @@ export default function App() {
       </header>
 
       {/* ==========================================
-          SIDEBAR NAVIGATION (Desktop/Tablet)
+          SIDEBAR NAVIGATION (Sleek Minimal Rounded Side Dock)
           ========================================== */}
       <aside className="app-sidebar">
-        <div className="sidebar-logo">
-          Kairos<span>.</span>
+        <div className="sidebar-logo" onClick={() => setActiveTab('dashboard')} title="Kairos">
+          K<span>.</span>
         </div>
         <nav className="sidebar-nav">
           <button 
             className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
             onClick={() => setActiveTab('dashboard')}
+            data-tooltip="Dashboard"
+            aria-label="Dashboard"
           >
-            <Home size={18} /> Dashboard
+            <Home size={20} />
           </button>
           <button 
             className={`nav-item ${activeTab === 'habits' ? 'active' : ''}`}
             onClick={() => setActiveTab('habits')}
+            data-tooltip="Habits"
+            aria-label="Habits"
           >
-            <Sparkles size={18} /> Habits
+            <Sparkles size={20} />
           </button>
           <button 
             className={`nav-item ${activeTab === 'study' ? 'active' : ''}`}
             onClick={() => setActiveTab('study')}
+            data-tooltip="Study Planner"
+            aria-label="Study Planner"
           >
-            <BookOpen size={18} /> Study Planner
+            <BookOpen size={20} />
           </button>
           <button 
             className={`nav-item ${activeTab === 'goals' ? 'active' : ''}`}
             onClick={() => setActiveTab('goals')}
+            data-tooltip="Progress Sanctuary"
+            aria-label="Progress Sanctuary"
           >
-            <CheckSquare size={18} /> Progress
+            <CheckSquare size={20} />
           </button>
         </nav>
-        <footer className="sidebar-footer">
-          Designed for solitude
+        <footer className="sidebar-footer" title="Designed for solitude">
+          K
         </footer>
       </aside>
-
-      {/* ==========================================
-          BOTTOM NAVIGATION BAR (Mobile only)
-          ========================================== */}
-      <nav className="app-bottom-nav">
-        <button 
-          className={`bottom-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
-          onClick={() => setActiveTab('dashboard')}
-        >
-          <Home size={20} />
-          <span>Home</span>
-        </button>
-        <button 
-          className={`bottom-nav-item ${activeTab === 'habits' ? 'active' : ''}`}
-          onClick={() => setActiveTab('habits')}
-        >
-          <Sparkles size={20} />
-          <span>Habits</span>
-        </button>
-        <button 
-          className={`bottom-nav-item ${activeTab === 'study' ? 'active' : ''}`}
-          onClick={() => setActiveTab('study')}
-        >
-          <BookOpen size={20} />
-          <span>Study</span>
-        </button>
-        <button 
-          className={`bottom-nav-item ${activeTab === 'goals' ? 'active' : ''}`}
-          onClick={() => setActiveTab('goals')}
-        >
-          <CheckSquare size={20} />
-          <span>Progress</span>
-        </button>
-      </nav>
 
       {/* ==========================================
           MAIN VIEWPORT

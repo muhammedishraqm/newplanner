@@ -132,77 +132,137 @@ button, input, select, textarea {
   box-shadow: 0 0 8px var(--accent-primary);
 }
 
-/* Navigation Shell - Sidebar (Desktop) */
+/* Navigation Shell - Premium Floating Sidebar (Desktop) */
 .app-sidebar {
+  position: fixed;
+  left: 20px;
+  top: 20px;
+  bottom: 20px;
+  width: 76px;
+  height: calc(100vh - 40px);
+  background-color: rgba(246, 244, 241, 0.85); /* Cozy Translucent Sand */
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(228, 222, 210, 0.7);
+  border-radius: 28px;
+  padding: 24px 12px;
   display: flex;
   flex-direction: column;
-  width: 260px;
-  height: 100%;
-  background-color: var(--bg-surface); /* Warm Stone */
-  border-right: 1px solid var(--border-color);
-  padding: 40px 24px var(--safe-bottom) 24px;
-  flex-shrink: 0;
-  z-index: 110;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+  z-index: 1000;
+  transition: all var(--transition-normal);
 }
 
 .sidebar-logo {
   font-family: var(--font-serif);
-  font-size: 2.2rem;
+  font-size: 1.4rem;
   font-weight: 700;
   font-style: italic;
-  margin-bottom: 40px;
-  padding-left: 12px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #FFFFFF;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  margin-bottom: 24px;
+  padding-left: 0;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.sidebar-logo:hover {
+  transform: rotate(-10deg) scale(1.05);
+  border-color: var(--accent-primary);
 }
 
 .sidebar-logo span {
   color: var(--accent-primary);
-  font-size: 2.5rem;
-  line-height: 0;
-  margin-left: 2px;
+  font-size: 1.6rem;
+  margin-left: 1px;
 }
 
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  gap: 16px;
   flex-grow: 1;
+  justify-content: center;
+  width: 100%;
 }
 
 .nav-item {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 12px 16px;
-  border-radius: 14px;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
   color: var(--text-secondary);
   background: transparent;
   border: none;
   cursor: pointer;
-  text-align: left;
-  transition: all var(--transition-fast);
-  font-weight: 500;
+  transition: all var(--transition-normal);
+  padding: 0;
 }
 
 .nav-item:hover {
   color: var(--text-primary);
-  background-color: var(--bg-surface-hover);
+  background-color: rgba(228, 222, 210, 0.4);
+  transform: scale(1.08);
 }
 
 .nav-item.active {
   color: #FFFFFF;
-  background-color: var(--accent-black); /* High contrast black active links */
+  background-color: var(--accent-black); /* Cozy contrast black */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  transform: scale(1.1);
+}
+
+/* Premium Navigation Tooltips */
+.nav-item::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 64px;
+  background-color: var(--accent-black);
+  color: #FFFFFF;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-family: var(--font-sans);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-10px);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.nav-item:hover::after {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .sidebar-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: rgba(228, 222, 210, 0.3);
   color: var(--text-muted);
-  font-size: 0.8rem;
-  padding-left: 12px;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-align: center;
+  cursor: default;
 }
 
 /* Main Content Area */
@@ -1007,59 +1067,57 @@ button, input, select, textarea {
 /* Responsive Viewports */
 @media (max-width: 767.98px) {
   .app-container {
-    flex-direction: column;
+    flex-direction: row; /* Keep row direction for floating sidebar */
   }
   
   .app-sidebar {
-    display: none;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    bottom: auto;
+    width: 60px;
+    height: auto;
+    padding: 16px 8px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
   }
   
-  /* Fixed translucent glass bottom dock on iPhone Safari */
-  .app-bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: calc(64px + var(--safe-bottom));
-    background-color: rgba(246, 244, 241, 0.85); /* Translucent Paper */
-    backdrop-filter: blur(16px) saturate(140%);
-    -webkit-backdrop-filter: blur(16px) saturate(140%);
-    border-top: 1px solid var(--border-color);
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    padding-bottom: var(--safe-bottom);
-    z-index: 120;
+  .sidebar-logo {
+    display: none; /* Hide logo inside mobile side-dock */
   }
   
-  .bottom-nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    background: transparent;
-    border: none;
-    color: var(--text-muted);
-    flex-grow: 1;
-    height: 100%;
-    cursor: pointer;
-    font-size: 0.65rem;
-    font-weight: 600;
-    transition: color var(--transition-fast);
+  .sidebar-nav {
+    gap: 12px;
   }
   
-  .bottom-nav-item.active {
-    color: var(--text-primary); /* Active bottom tab is high-contrast Black */
+  .nav-item {
+    width: 42px;
+    height: 42px;
+  }
+  
+  .nav-item::after {
+    display: none; /* Hide tooltips on mobile */
+  }
+  
+  .sidebar-footer {
+    display: none; /* Hide footer */
+  }
+  
+  .app-header {
+    padding-left: 84px !important;
   }
   
   .main-viewport {
-    padding: calc(64px + var(--safe-top)) 16px calc(76px + var(--safe-bottom)) 16px;
+    padding: calc(64px + var(--safe-top)) 16px 24px calc(84px + var(--safe-left)) !important;
     height: 100vh;
   }
   
+  .app-bottom-nav {
+    display: none !important;
+  }
+  
   .fab {
-    bottom: calc(80px + var(--safe-bottom));
+    bottom: 24px;
     right: 16px;
   }
   
@@ -1074,7 +1132,7 @@ button, input, select, textarea {
   }
   
   .main-viewport {
-    padding: 48px 40px;
+    padding: 48px 40px 48px 120px;
     height: 100vh;
   }
   
