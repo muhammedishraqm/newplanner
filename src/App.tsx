@@ -408,157 +408,48 @@ export default function App() {
 
   // Load and Save Local Storage
   useEffect(() => {
+    // One-time migration to wipe the legacy seeded sample data
+    const isWiped = localStorage.getItem('kairos_sample_wiped');
+    if (!isWiped) {
+      localStorage.removeItem('kairos_habits');
+      localStorage.removeItem('kairos_study');
+      localStorage.removeItem('kairos_daily_tasks');
+      localStorage.removeItem('kairos_sleep_logs');
+      localStorage.setItem('kairos_sample_wiped', 'true');
+    }
+
     const cachedHabits = localStorage.getItem('kairos_habits');
     const cachedStudy = localStorage.getItem('kairos_study');
     const cachedDailyTasks = localStorage.getItem('kairos_daily_tasks');
+    const cachedSleep = localStorage.getItem('kairos_sleep_logs');
     const cachedPwa = localStorage.getItem('kairos_pwa_dismissed');
 
-    // Make sure we adjust dates dynamically if using default data, so the user sees logs relative to today!
     if (cachedDailyTasks) {
       setDailyTasks(JSON.parse(cachedDailyTasks));
     } else {
-      const seededTasks: DailyTask[] = [
-        { id: 'dt1', name: 'Machine Learning Coding', hours: 2, completed: false, date: getTodayString(), createdAt: new Date().toISOString() },
-        { id: 'dt2', name: 'Systems Research Notes', hours: 3, completed: false, date: getTodayString(), createdAt: new Date().toISOString() },
-        { id: 'dt3', name: 'Responsive Web Layouts', hours: 5, completed: false, date: getTodayString(), createdAt: new Date().toISOString() }
-      ];
-      setDailyTasks(seededTasks);
-      localStorage.setItem('kairos_daily_tasks', JSON.stringify(seededTasks));
+      setDailyTasks([]);
+      localStorage.setItem('kairos_daily_tasks', JSON.stringify([]));
     }
 
     if (cachedHabits) {
       setHabits(JSON.parse(cachedHabits));
     } else {
-      // Modify seed data history to match current date
-      const today = new Date();
-      const yesterday = new Date();
-      yesterday.setDate(today.getDate() - 1);
-      
-      const format = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      const tStr = format(today);
-      const yStr = format(yesterday);
-      
-      const seededHabits: Habit[] = [
-        {
-          id: 'h1',
-          name: 'Morning Mindfulness',
-          description: '10 minutes of silent meditation',
-          icon: '',
-          color: 'var(--accent-sage)',
-          streak: 2,
-          history: [yStr, tStr],
-          frequency: 'Everyday',
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: 'h2',
-          name: 'Read Non-Fiction',
-          description: '20 pages of personal development',
-          icon: '',
-          color: 'var(--accent-primary)',
-          streak: 1,
-          history: [yStr],
-          frequency: 'Everyday',
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: 'h3',
-          name: 'Strength Workout',
-          description: '45 mins push/pull or legs routines',
-          icon: '',
-          color: 'var(--accent-terracotta)',
-          streak: 0,
-          history: [yStr],
-          frequency: '5x a week',
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: 'h4',
-          name: 'Hydrate Consistently',
-          description: 'Drink 3 liters of spring water',
-          icon: '',
-          color: 'var(--accent-slate)',
-          streak: 1,
-          history: [tStr],
-          frequency: 'Everyday',
-          createdAt: new Date().toISOString()
-        }
-      ];
-      setHabits(seededHabits);
-      localStorage.setItem('kairos_habits', JSON.stringify(seededHabits));
+      setHabits([]);
+      localStorage.setItem('kairos_habits', JSON.stringify([]));
     }
 
     if (cachedStudy) {
       setStudySessions(JSON.parse(cachedStudy));
     } else {
-      const today = new Date();
-      const yesterday = new Date();
-      yesterday.setDate(today.getDate() - 1);
-      const dayBefore = new Date();
-      dayBefore.setDate(today.getDate() - 2);
-
-      const format = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      const seededStudy: StudySession[] = [
-        {
-          id: 's1',
-          subject: 'Machine Learning',
-          topic: 'Neural Network Weight Backpropagation & Calculus',
-          durationGoal: 90,
-          date: format(today),
-          completed: true,
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: 's2',
-          subject: 'Design Systems',
-          topic: 'Typography Hierarchy, Responsive Scales & HSL variables',
-          durationGoal: 60,
-          date: format(today),
-          completed: false,
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: 's3',
-          subject: 'Computer Systems',
-          topic: 'CPU Cache L1/L2 coherence protocols',
-          durationGoal: 120,
-          date: format(yesterday),
-          completed: true,
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: 's4',
-          subject: 'Creative Writing',
-          topic: 'Pacing and editorial flow in personal essays',
-          durationGoal: 45,
-          date: format(dayBefore),
-          completed: true,
-          createdAt: new Date().toISOString()
-        }
-      ];
-      setStudySessions(seededStudy);
-      localStorage.setItem('kairos_study', JSON.stringify(seededStudy));
+      setStudySessions([]);
+      localStorage.setItem('kairos_study', JSON.stringify([]));
     }
 
-
-    const cachedSleep = localStorage.getItem('kairos_sleep_logs');
     if (cachedSleep) {
       setSleepLogs(JSON.parse(cachedSleep));
     } else {
-      const seededSleep: { [date: string]: number } = {};
-      const today = new Date();
-      for (let i = 0; i < 150; i++) {
-        const d = new Date();
-        d.setDate(today.getDate() - i);
-        const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-        const rand = Math.random();
-        if (rand < 0.45) seededSleep[dateStr] = 8;
-        else if (rand < 0.70) seededSleep[dateStr] = 7;
-        else if (rand < 0.85) seededSleep[dateStr] = 9;
-        else if (rand < 0.90) seededSleep[dateStr] = 10;
-      }
-      setSleepLogs(seededSleep);
-      localStorage.setItem('kairos_sleep_logs', JSON.stringify(seededSleep));
+      setSleepLogs({});
+      localStorage.setItem('kairos_sleep_logs', JSON.stringify({}));
     }
 
     if (cachedPwa) {
