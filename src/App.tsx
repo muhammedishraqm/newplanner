@@ -813,12 +813,9 @@ export default function App() {
           HEADER (Mobile top bar with status translucent)
           ========================================== */}
       <header className="app-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <img src="/logo.jpg" alt="Kairos Logo" style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--border-color)' }} />
-          <h1 className="serif-font" style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0 }}>
-            Kairos
-          </h1>
-        </div>
+        <h1 className="serif-font">
+          Kairos<span className="header-accent-dot"></span>
+        </h1>
         <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
           {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
         </div>
@@ -829,7 +826,7 @@ export default function App() {
           ========================================== */}
       <aside className="app-sidebar">
         <div className="sidebar-logo" onClick={() => setActiveTab('dashboard')} title="Kairos">
-          <img src="/logo.jpg" alt="Kairos Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          K<span>.</span>
         </div>
         <nav className="sidebar-nav">
           <button 
