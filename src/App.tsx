@@ -1014,52 +1014,56 @@ export default function App() {
                       <div 
                         className={nodeClass} 
                       />
-                      <div className={cardClass}>
-                        {item.isGap ? (
+                      {item.isGap ? (
+                        <div className={cardClass}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.72rem', color: 'var(--text-muted)', lineHeight: 1 }}>
                             <span style={{ fontWeight: 500, fontSize: '0.68rem', color: 'var(--text-muted)', opacity: 0.75 }}>{item.timeLabel.split(' - ')[0]}</span>
                             <span style={{ color: 'var(--border-color)', opacity: 0.5 }}>•</span>
                             <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>{item.title}</span>
                           </div>
-                        ) : (
-                          <>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
-                              <span className="serif-font" style={{ fontSize: '0.75rem', fontWeight: 700, color: isNodeActive ? '#FFFFFF' : 'var(--text-muted)', textTransform: 'uppercase' }}>
-                                {item.timeLabel}
-                              </span>
-                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                <button 
-                                  onClick={() => handleDeleteTask(item.id.split('_part_')[0])}
-                                  style={{ background: 'transparent', border: 'none', color: isNodeActive ? 'rgba(255,255,255,0.7)' : 'var(--text-muted)', cursor: 'pointer', padding: 0 }}
-                                  aria-label="Delete task"
-                                >
-                                  <Trash2 size={14} />
-                                </button>
-                                <div 
-                                  className={`subtask-checkbox ${item.completed ? 'checked' : ''}`}
-                                  onClick={() => handleToggleTaskCompleted(item.id.split('_part_')[0])}
-                                  style={{ 
-                                    width: '18px', 
-                                    height: '18px', 
-                                    borderRadius: '50%', 
-                                    border: `1.5px solid ${isNodeActive ? '#FFFFFF' : 'var(--border-color)'}`,
-                                    backgroundColor: item.completed ? (isNodeActive ? '#FFFFFF' : 'var(--accent-black)') : 'transparent',
-                                    color: item.completed ? (isNodeActive ? 'var(--accent-primary)' : '#FFFFFF') : 'transparent'
-                                  }}
-                                >
-                                  {item.completed && <Check size={12} />}
-                                </div>
-                              </div>
-                            </div>
-                            <h4 className="serif-font" style={{ fontSize: '1.25rem', fontWeight: 600, marginTop: '2px', color: isNodeActive ? '#FFFFFF' : 'var(--text-primary)' }}>
-                              {item.title}
-                            </h4>
-                            <p style={{ fontSize: '0.85rem', color: isNodeActive ? 'rgba(255, 255, 255, 0.85)' : 'var(--text-secondary)', marginTop: '4px' }}>
-                              {item.description}
-                            </p>
-                          </>
-                        )}
-                      </div>
+                        </div>
+                      ) : (
+                        <div 
+                          className={cardClass}
+                          onClick={() => handleToggleTaskCompleted(item.id.split('_part_')[0])}
+                          style={{ 
+                            cursor: 'pointer', 
+                            opacity: item.completed ? 0.65 : 1, 
+                            transition: 'opacity 0.2s ease, transform 0.2s ease'
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
+                            <span className="serif-font" style={{ fontSize: '0.75rem', fontWeight: 700, color: isNodeActive ? '#FFFFFF' : 'var(--text-muted)', textTransform: 'uppercase' }}>
+                              {item.timeLabel}
+                            </span>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteTask(item.id.split('_part_')[0]);
+                              }}
+                              style={{ background: 'transparent', border: 'none', color: isNodeActive ? 'rgba(255,255,255,0.7)' : 'var(--text-muted)', cursor: 'pointer', padding: 0 }}
+                              aria-label="Delete task"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                          <h4 
+                            className="serif-font" 
+                            style={{ 
+                              fontSize: '1.25rem', 
+                              fontWeight: 600, 
+                              marginTop: '2px', 
+                              color: isNodeActive ? '#FFFFFF' : 'var(--text-primary)',
+                              textDecoration: item.completed ? 'line-through' : 'none'
+                            }}
+                          >
+                            {item.title}
+                          </h4>
+                          <p style={{ fontSize: '0.85rem', color: isNodeActive ? 'rgba(255, 255, 255, 0.85)' : 'var(--text-secondary)', marginTop: '4px' }}>
+                            {item.description}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
