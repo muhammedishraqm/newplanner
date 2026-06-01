@@ -1186,12 +1186,9 @@ export default function App() {
 
               {/* Quick Task Scheduler Widget */}
               <div className="card" style={{ marginBottom: '24px' }}>
-                <h3 className="card-title serif-font" style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h3 className="card-title serif-font" style={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
                   <Clock size={16} style={{ color: 'var(--accent-primary)' }} /> Quick Task Scheduler
                 </h3>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '14px' }}>
-                  Input daily tasks with duration. Kairos will auto-schedule them between 9:00 AM and 10:00 PM, injecting food slots and practice refreshers automatically.
-                </p>
                 <form onSubmit={handleQuickAddTask} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                   <input 
                     type="text" 
