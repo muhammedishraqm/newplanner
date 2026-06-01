@@ -1346,3 +1346,24 @@ button, input, select, textarea {
 .contribution-cell.is-future {
   opacity: 0.25;
 }
+
+/* Sleep log cell intensity colors */
+.contribution-cell.sleep-intensity-none {
+  background-color: var(--bg-surface) !important;
+}
+
+.contribution-cell.sleep-7 {
+  background-color: #A3BFD9 !important; /* light steel blue */
+}
+
+.contribution-cell.sleep-8 {
+  background-color: #6C92BF !important; /* medium slate blue */
+}
+
+.contribution-cell.sleep-9 {
+  background-color: #375F91 !important; /* deep indigo */
+}
+
+.contribution-cell.sleep-10 {
+  background-color: #1A2E4C !important; /* royal premium midnight blue */
+}

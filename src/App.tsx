@@ -10,7 +10,8 @@ import {
   Smartphone, 
   Home, 
   Clock, 
-  Sparkles
+  Sparkles,
+  Moon
 } from 'lucide-react';
 
 // ==========================================
@@ -382,6 +383,7 @@ export default function App() {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [studySessions, setStudySessions] = useState<StudySession[]>([]);
   const [dailyTasks, setDailyTasks] = useState<DailyTask[]>([]);
+  const [sleepLogs, setSleepLogs] = useState<{ [date: string]: number }>({});
   const [quickTaskName, setQuickTaskName] = useState('');
   const [quickTaskHours, setQuickTaskHours] = useState('2');
 
@@ -539,6 +541,26 @@ export default function App() {
     }
 
 
+    const cachedSleep = localStorage.getItem('kairos_sleep_logs');
+    if (cachedSleep) {
+      setSleepLogs(JSON.parse(cachedSleep));
+    } else {
+      const seededSleep: { [date: string]: number } = {};
+      const today = new Date();
+      for (let i = 0; i < 150; i++) {
+        const d = new Date();
+        d.setDate(today.getDate() - i);
+        const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        const rand = Math.random();
+        if (rand < 0.45) seededSleep[dateStr] = 8;
+        else if (rand < 0.70) seededSleep[dateStr] = 7;
+        else if (rand < 0.85) seededSleep[dateStr] = 9;
+        else if (rand < 0.90) seededSleep[dateStr] = 10;
+      }
+      setSleepLogs(seededSleep);
+      localStorage.setItem('kairos_sleep_logs', JSON.stringify(seededSleep));
+    }
+
     if (cachedPwa) {
       setPwaDismissed(JSON.parse(cachedPwa));
     }
@@ -565,6 +587,19 @@ export default function App() {
   // ==========================================
   // ACTION HANDLERS
   // ==========================================
+
+  // Sleep Duration Log
+  const handleLogSleep = (hours: number) => {
+    const current = sleepLogs[selectedDate];
+    const updated = { ...sleepLogs };
+    if (current === hours) {
+      delete updated[selectedDate];
+    } else {
+      updated[selectedDate] = hours;
+    }
+    setSleepLogs(updated);
+    localStorage.setItem('kairos_sleep_logs', JSON.stringify(updated));
+  };
 
   // Habit Toggle Check
   const handleToggleHabit = (id: string) => {
@@ -1300,7 +1335,99 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* 2. Habit blueprints list stack with individual heatmaps (exactly like screenshot!) */}
+                {/* 2. Sleep Time Analysis Heatmap */}
+                <div className="card" style={{ marginBottom: '20px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
+                    <div>
+                      <h4 className="serif-font" style={{ fontSize: '1.2rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Moon size={18} style={{ color: '#375F91' }} /> Sleep Time Analysis
+                      </h4>
+                      <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                        Visualizing sleep duration patterns over the last 22 weeks.
+                      </p>
+                    </div>
+                    {sleepLogs[selectedDate] && (
+                      <span style={{ fontSize: '0.78rem', color: '#1A2E4C', backgroundColor: '#E1EDF7', padding: '2px 8px', borderRadius: '8px', fontWeight: 600 }}>
+                        {sleepLogs[selectedDate]} hours logged
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Sleep Heatmap Grid */}
+                  <div className="contribution-grid-scroll" style={{ marginBottom: '16px' }}>
+                    <div className="contribution-grid-container">
+                      <div className="contribution-grid-weekdays">
+                        <span>S</span>
+                        <span>M</span>
+                        <span>T</span>
+                        <span>W</span>
+                        <span>T</span>
+                        <span>F</span>
+                        <span>S</span>
+                      </div>
+                      <div className="contribution-grid-columns">
+                        {getContributionGridData(22).map((col, colIdx) => (
+                          <div key={colIdx} className="contribution-grid-column">
+                            {col.map((day) => {
+                              const hours = sleepLogs[day.dateStr];
+                              let cellClass = 'sleep-intensity-none';
+                              if (hours === 7) cellClass = 'sleep-7';
+                              else if (hours === 8) cellClass = 'sleep-8';
+                              else if (hours === 9) cellClass = 'sleep-9';
+                              else if (hours === 10) cellClass = 'sleep-10';
+                              
+                              const tooltip = hours 
+                                ? `${hours} hours of sleep` 
+                                : 'No sleep data logged';
+
+                              return (
+                                <div 
+                                  key={day.dateStr}
+                                  className={`contribution-cell ${cellClass} ${day.isFuture ? 'is-future' : ''}`}
+                                  title={`${day.dateStr}: ${tooltip}`}
+                                />
+                              );
+                            })}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Sleep Logging Action Row */}
+                  <div style={{ borderTop: '1px solid var(--border-color-light)', paddingTop: '14px' }}>
+                    <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                      Log sleep duration for {getSelectedDateDisplay()}:
+                    </span>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
+                      {[7, 8, 9, 10].map((hours) => {
+                        const isSelected = sleepLogs[selectedDate] === hours;
+                        return (
+                          <button
+                            key={hours}
+                            onClick={() => handleLogSleep(hours)}
+                            style={{
+                              backgroundColor: isSelected ? '#000000' : 'var(--bg-surface)',
+                              color: isSelected ? '#FFFFFF' : 'var(--text-secondary)',
+                              border: 'none',
+                              padding: '8px 16px',
+                              borderRadius: '12px',
+                              fontSize: '0.8rem',
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              transition: 'all 0.2s ease',
+                              fontFamily: 'var(--font-sans)',
+                            }}
+                          >
+                            {hours} hrs {isSelected && '✓'}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Habit blueprints list stack with individual heatmaps (exactly like screenshot!) */}
                 <div>
                   <h4 className="serif-font" style={{ fontSize: '1.25rem', fontStyle: 'italic', marginBottom: '12px' }}>Habit Blueprints</h4>
                   {habits.length === 0 ? (
