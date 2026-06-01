@@ -39,22 +39,7 @@ interface StudySession {
   createdAt: string;
 }
 
-interface SubTask {
-  id: string;
-  title: string;
-  completed: boolean;
-}
 
-interface Goal {
-  id: string;
-  title: string;
-  deadline: string; // YYYY-MM-DD
-  priority: 'high' | 'medium' | 'low';
-  completed: boolean;
-  completedAt?: string; // YYYY-MM-DD
-  subTasks: SubTask[];
-  createdAt: string;
-}
 
 interface DailyTask {
   id: string;
@@ -396,7 +381,6 @@ export default function App() {
   // Core Data States
   const [habits, setHabits] = useState<Habit[]>([]);
   const [studySessions, setStudySessions] = useState<StudySession[]>([]);
-  const [goals, setGoals] = useState<Goal[]>([]);
   const [dailyTasks, setDailyTasks] = useState<DailyTask[]>([]);
   const [quickTaskName, setQuickTaskName] = useState('');
   const [quickTaskHours, setQuickTaskHours] = useState('2');
@@ -404,7 +388,6 @@ export default function App() {
   // Modal Control States
   const [showHabitModal, setShowHabitModal] = useState(false);
   const [showStudyModal, setShowStudyModal] = useState(false);
-  const [showGoalModal, setShowGoalModal] = useState(false);
 
   // New Habit Form States
   const [newHabitName, setNewHabitName] = useState('');
@@ -419,20 +402,12 @@ export default function App() {
   const [newStudyDuration, setNewStudyDuration] = useState('60');
   const [newStudyDate, setNewStudyDate] = useState(getTodayString());
 
-  // New Goal Form States
-  const [newGoalTitle, setNewGoalTitle] = useState('');
-  const [newGoalDeadline, setNewGoalDeadline] = useState(getTodayString());
-  const [newGoalPriority, setNewGoalPriority] = useState<'high' | 'medium' | 'low'>('medium');
-  const [newGoalSubtasksText, setNewGoalSubtasksText] = useState('');
 
-  // Goals Filtering States
-  const [goalsFilter, setGoalsFilter] = useState<'all' | 'high' | 'medium' | 'low' | 'completed'>('all');
 
   // Load and Save Local Storage
   useEffect(() => {
     const cachedHabits = localStorage.getItem('kairos_habits');
     const cachedStudy = localStorage.getItem('kairos_study');
-    const cachedGoals = localStorage.getItem('kairos_goals');
     const cachedDailyTasks = localStorage.getItem('kairos_daily_tasks');
     const cachedPwa = localStorage.getItem('kairos_pwa_dismissed');
 
@@ -563,46 +538,6 @@ export default function App() {
       localStorage.setItem('kairos_study', JSON.stringify(seededStudy));
     }
 
-    if (cachedGoals) {
-      setGoals(JSON.parse(cachedGoals));
-    } else {
-      const today = new Date();
-      const d1 = new Date(); d1.setDate(today.getDate() + 3);
-      const d2 = new Date(); d2.setDate(today.getDate() + 7);
-      
-      const format = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      const seededGoals: Goal[] = [
-        {
-          id: 'g1',
-          title: 'Deploy Kairos Standalone PWA',
-          deadline: format(d1),
-          priority: 'high',
-          completed: false,
-          subTasks: [
-            { id: 'gt1', title: 'Add Apple Mobile Web App tags', completed: true },
-            { id: 'gt2', title: 'Define premium CSS layout & safe area offsets', completed: true },
-            { id: 'gt3', title: 'Implement full local state sync engine', completed: false },
-            { id: 'gt4', title: 'Enable offline Safari add guides', completed: false }
-          ],
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: 'g2',
-          title: 'Finish "Atomic Habits" Reading Log',
-          deadline: format(d2),
-          priority: 'medium',
-          completed: false,
-          subTasks: [
-            { id: 'gt5', title: 'Obtain hardcover copy', completed: true },
-            { id: 'gt6', title: 'Read chapters 1 to 5', completed: false },
-            { id: 'gt7', title: 'Write identity-based notes in journal', completed: false }
-          ],
-          createdAt: new Date().toISOString()
-        }
-      ];
-      setGoals(seededGoals);
-      localStorage.setItem('kairos_goals', JSON.stringify(seededGoals));
-    }
 
     if (cachedPwa) {
       setPwaDismissed(JSON.parse(cachedPwa));
@@ -620,10 +555,7 @@ export default function App() {
     localStorage.setItem('kairos_study', JSON.stringify(updated));
   };
 
-  const updateGoalsState = (updated: Goal[]) => {
-    setGoals(updated);
-    localStorage.setItem('kairos_goals', JSON.stringify(updated));
-  };
+
 
   const dismissPwa = () => {
     setPwaDismissed(true);
@@ -774,110 +706,7 @@ export default function App() {
     updateStudyState(updated);
   };
 
-  // Goal/SubTask Toggle Check
-  const handleToggleSubtask = (goalId: string, subtaskId: string) => {
-    const updated = goals.map(goal => {
-      if (goal.id === goalId) {
-        const subTasks = goal.subTasks.map(st => {
-          if (st.id === subtaskId) {
-            return { ...st, completed: !st.completed };
-          }
-          return st;
-        });
 
-        // Determine if all subtasks are complete
-        const allCompleted = subTasks.length > 0 && subTasks.every(st => st.completed);
-        const completedAt = allCompleted ? getTodayString() : undefined;
-
-        return { ...goal, subTasks, completed: allCompleted, completedAt };
-      }
-      return goal;
-    });
-    updateGoalsState(updated);
-  };
-
-  // Goal Toggle Completed Manually (even without subtasks)
-  const handleToggleGoalCompleted = (goalId: string) => {
-    const todayStr = getTodayString();
-    const updated = goals.map(goal => {
-      if (goal.id === goalId) {
-        const nextState = !goal.completed;
-        // If completing, also check all subtasks
-        const subTasks = goal.subTasks.map(st => ({ ...st, completed: nextState }));
-        return { 
-          ...goal, 
-          completed: nextState, 
-          completedAt: nextState ? todayStr : undefined,
-          subTasks
-        };
-      }
-      return goal;
-    });
-    updateGoalsState(updated);
-  };
-
-  // Goal Add
-  const handleAddGoal = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newGoalTitle.trim()) return;
-
-    // Parse sub-tasks from lines of text
-    const lines = newGoalSubtasksText.split('\n').filter(line => line.trim() !== '');
-    const subTasks: SubTask[] = lines.map((line, idx) => ({
-      id: `sub_${Date.now()}_${idx}`,
-      title: line.trim(),
-      completed: false
-    }));
-
-    const newGoal: Goal = {
-      id: 'goal_' + Date.now(),
-      title: newGoalTitle.trim(),
-      deadline: newGoalDeadline,
-      priority: newGoalPriority,
-      completed: false,
-      subTasks,
-      createdAt: new Date().toISOString()
-    };
-
-    updateGoalsState([newGoal, ...goals]);
-
-    // Clear and close
-    setNewGoalTitle('');
-    setNewGoalDeadline(getTodayString());
-    setNewGoalPriority('medium');
-    setNewGoalSubtasksText('');
-    setShowGoalModal(false);
-  };
-
-  // Goal Add Subtask Inline
-  const [inlineSubtaskText, setInlineSubtaskText] = useState<{ [key: string]: string }>({});
-  const handleAddInlineSubtask = (goalId: string) => {
-    const text = inlineSubtaskText[goalId] || '';
-    if (!text.trim()) return;
-
-    const newSub: SubTask = {
-      id: `sub_${Date.now()}`,
-      title: text.trim(),
-      completed: false
-    };
-
-    const updated = goals.map(g => {
-      if (g.id === goalId) {
-        const subTasks = [...g.subTasks, newSub];
-        return { ...g, subTasks, completed: false }; // reset completion if new task added
-      }
-      return g;
-    });
-
-    updateGoalsState(updated);
-    setInlineSubtaskText({ ...inlineSubtaskText, [goalId]: '' });
-  };
-
-  // Goal Delete
-  const handleDeleteGoal = (goalId: string) => {
-    const updated = goals.filter(g => g.id !== goalId);
-    updateGoalsState(updated);
-  };
 
   // ==========================================
   // VIEW COMPUTATIONS
@@ -925,21 +754,6 @@ export default function App() {
   };
   const weeklyStudyHours = (getWeeklyStudyMinutes() / 60).toFixed(1);
 
-  // Subtasks progress
-  const getGoalProgressMetrics = () => {
-    const activeGoals = goals.filter(g => !g.completed);
-    let completedSub = 0;
-    let totalSub = 0;
-    activeGoals.forEach(g => {
-      g.subTasks.forEach(st => {
-        totalSub++;
-        if (st.completed) completedSub++;
-      });
-    });
-    return { completedSub, totalSub };
-  };
-  const { completedSub, totalSub } = getGoalProgressMetrics();
-
   // 2. Study weekly chart array calculation
   const studyChartData = weekDates.map(day => {
     const minutes = studySessions
@@ -953,133 +767,7 @@ export default function App() {
     };
   });
 
-  // 3. Goal filters
-  const filteredGoals = goals.filter(g => {
-    if (goalsFilter === 'all') return true;
-    if (goalsFilter === 'completed') return g.completed;
-    return g.priority === goalsFilter && !g.completed;
-  });
 
-  // 4. Progress page stats
-  const activeHabitsCount = habits.length;
-  const completedHabitsCount = habits.filter(h => h.history.includes(todayStr)).length;
-  const habitsRate = activeHabitsCount > 0 ? Math.round((completedHabitsCount / activeHabitsCount) * 100) : 0;
-
-  const studyTargetHrs = 15;
-  const currentStudyHrs = parseFloat(weeklyStudyHours) || 0;
-  const studyRate = Math.min(Math.round((currentStudyHrs / studyTargetHrs) * 100), 100);
-
-  const completedGoalsList = goals.filter(g => g.completed);
-  const activeGoalsList = goals.filter(g => !g.completed);
-  const goalsCount = goals.length;
-  const goalsCompletedCount = completedGoalsList.length;
-  const goalsRate = goalsCount > 0 ? Math.round((goalsCompletedCount / goalsCount) * 100) : 0;
-
-  // 5. Goal card rendering helper
-  const renderGoalCard = (goal: Goal) => {
-    const completedSubtasks = goal.subTasks.filter(st => st.completed).length;
-    const totalSubtasks = goal.subTasks.length;
-    const progressPercent = totalSubtasks > 0 ? Math.round((completedSubtasks / totalSubtasks) * 100) : (goal.completed ? 100 : 0);
-    
-    return (
-      <div key={goal.id} className="goal-item" style={{ opacity: goal.completed ? 0.78 : 1 }}>
-        <div className="goal-header">
-          <div className="goal-title-area">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-              <h4 className="goal-title" style={{ textDecoration: goal.completed ? 'line-through' : 'none', color: goal.completed ? 'var(--text-muted)' : 'var(--text-primary)' }}>
-                {goal.title}
-              </h4>
-              <span className={`tag tag-${goal.priority}`}>{goal.priority}</span>
-            </div>
-            <span className="goal-date">
-              Deadline: {new Date(goal.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-            </span>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <button 
-              onClick={() => handleDeleteGoal(goal.id)}
-              style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '6px' }}
-              aria-label="Delete goal"
-            >
-              <Trash2 size={15} />
-            </button>
-            <button 
-              className={`btn ${goal.completed ? 'btn-secondary' : 'btn-primary'}`}
-              onClick={() => handleToggleGoalCompleted(goal.id)}
-              style={{ padding: '6px 10px', fontSize: '0.75rem' }}
-            >
-              {goal.completed ? 'Mark Active' : 'Mark Done'}
-            </button>
-          </div>
-        </div>
-
-        {/* Goal progress metrics */}
-        <div className="goal-progress-wrap">
-          <div className="goal-progress-bar">
-            <div 
-              className="goal-progress-fill" 
-              style={{ width: `${progressPercent}%` }}
-            />
-          </div>
-          <div className="goal-progress-info">
-            <span className="serif-font" style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-              {progressPercent}% <span style={{ fontSize: '0.75rem', fontFamily: 'var(--font-sans)', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Complete</span>
-            </span>
-            <span>{completedSubtasks} / {totalSubtasks} steps done</span>
-          </div>
-        </div>
-
-        {/* Subtasks listing */}
-        <div>
-          <div className="subtasks-title">Action Steps</div>
-          {goal.subTasks.length === 0 ? (
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic', marginBottom: '12px' }}>
-              No action steps logged. Add one below.
-            </p>
-          ) : (
-            <div className="subtasks-list" style={{ marginBottom: '12px' }}>
-              {goal.subTasks.map(sub => (
-                <div key={sub.id} className="subtask-item">
-                  <div 
-                    className={`subtask-checkbox ${sub.completed ? 'checked' : ''}`}
-                    onClick={() => handleToggleSubtask(goal.id, sub.id)}
-                  >
-                    {sub.completed && <Check size={12} />}
-                  </div>
-                  <span className={`subtask-text ${sub.completed ? 'checked' : ''}`}>
-                    {sub.title}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Quick inline subtask adder */}
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <input 
-              type="text"
-              className="input-field"
-              placeholder="Add action step..."
-              value={inlineSubtaskText[goal.id] || ''}
-              onChange={(e) => setInlineSubtaskText({ ...inlineSubtaskText, [goal.id]: e.target.value })}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleAddInlineSubtask(goal.id);
-              }}
-              style={{ padding: '6px 12px', fontSize: '0.85rem', flexGrow: 1 }}
-            />
-            <button 
-              className="btn btn-secondary"
-              onClick={() => handleAddInlineSubtask(goal.id)}
-              style={{ padding: '6px 12px', fontSize: '0.85rem' }}
-            >
-              Add
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   // Today's formatted display date
   const displayTodayDate = new Date().toLocaleDateString('en-US', {
@@ -1287,53 +975,54 @@ export default function App() {
                   const nodeClass = `timeline-node ${item.completed ? 'completed' : ''} ${isNodeActive ? 'active' : ''} ${item.isGap ? 'is-gap-node' : ''}`;
 
                   return (
-                    <div key={item.id} className="timeline-item-wrap">
+                    <div key={item.id} className={`timeline-item-wrap ${item.isGap ? 'is-gap-wrap' : ''}`}>
                       <div 
                         className={nodeClass} 
                       />
                       <div className={cardClass}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: item.isGap ? '2px' : '6px' }}>
-                          <span className="serif-font" style={{ fontSize: '0.75rem', fontWeight: 700, color: isNodeActive && !item.isGap ? '#FFFFFF' : 'var(--text-muted)', textTransform: 'uppercase' }}>
-                            {item.timeLabel}
-                          </span>
-                          {!item.isGap && (
-                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                              <button 
-                                onClick={() => handleDeleteTask(item.id.split('_part_')[0])}
-                                style={{ background: 'transparent', border: 'none', color: isNodeActive ? 'rgba(255,255,255,0.7)' : 'var(--text-muted)', cursor: 'pointer', padding: 0 }}
-                                aria-label="Delete task"
-                              >
-                                <Trash2 size={14} />
-                              </button>
-                              <div 
-                                className={`subtask-checkbox ${item.completed ? 'checked' : ''}`}
-                                onClick={() => handleToggleTaskCompleted(item.id.split('_part_')[0])}
-                                style={{ 
-                                  width: '18px', 
-                                  height: '18px', 
-                                  borderRadius: '50%', 
-                                  border: `1.5px solid ${isNodeActive ? '#FFFFFF' : 'var(--border-color)'}`,
-                                  backgroundColor: item.completed ? (isNodeActive ? '#FFFFFF' : 'var(--accent-black)') : 'transparent',
-                                  color: item.completed ? (isNodeActive ? 'var(--accent-primary)' : '#FFFFFF') : 'transparent'
-                                }}
-                              >
-                                {item.completed && <Check size={12} />}
+                        {item.isGap ? (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.72rem', color: 'var(--text-muted)', lineHeight: 1 }}>
+                            <span style={{ fontWeight: 500, fontSize: '0.68rem', color: 'var(--text-muted)', opacity: 0.75 }}>{item.timeLabel.split(' - ')[0]}</span>
+                            <span style={{ color: 'var(--border-color)', opacity: 0.5 }}>•</span>
+                            <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>{item.title}</span>
+                          </div>
+                        ) : (
+                          <>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
+                              <span className="serif-font" style={{ fontSize: '0.75rem', fontWeight: 700, color: isNodeActive ? '#FFFFFF' : 'var(--text-muted)', textTransform: 'uppercase' }}>
+                                {item.timeLabel}
+                              </span>
+                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <button 
+                                  onClick={() => handleDeleteTask(item.id.split('_part_')[0])}
+                                  style={{ background: 'transparent', border: 'none', color: isNodeActive ? 'rgba(255,255,255,0.7)' : 'var(--text-muted)', cursor: 'pointer', padding: 0 }}
+                                  aria-label="Delete task"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                                <div 
+                                  className={`subtask-checkbox ${item.completed ? 'checked' : ''}`}
+                                  onClick={() => handleToggleTaskCompleted(item.id.split('_part_')[0])}
+                                  style={{ 
+                                    width: '18px', 
+                                    height: '18px', 
+                                    borderRadius: '50%', 
+                                    border: `1.5px solid ${isNodeActive ? '#FFFFFF' : 'var(--border-color)'}`,
+                                    backgroundColor: item.completed ? (isNodeActive ? '#FFFFFF' : 'var(--accent-black)') : 'transparent',
+                                    color: item.completed ? (isNodeActive ? 'var(--accent-primary)' : '#FFFFFF') : 'transparent'
+                                  }}
+                                >
+                                  {item.completed && <Check size={12} />}
+                                </div>
                               </div>
                             </div>
-                          )}
-                        </div>
-                        <h4 className="serif-font" style={{ fontSize: item.isGap ? '0.92rem' : '1.25rem', fontWeight: item.isGap ? 500 : 600, marginTop: '2px', color: isNodeActive && !item.isGap ? '#FFFFFF' : 'var(--text-primary)' }}>
-                          {item.title}
-                        </h4>
-                        {!item.isGap && (
-                          <p style={{ fontSize: '0.85rem', color: isNodeActive ? 'rgba(255, 255, 255, 0.85)' : 'var(--text-secondary)', marginTop: '4px' }}>
-                            {item.description}
-                          </p>
-                        )}
-                        {item.isGap && item.description && (
-                          <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                            {item.description}
-                          </p>
+                            <h4 className="serif-font" style={{ fontSize: '1.25rem', fontWeight: 600, marginTop: '2px', color: isNodeActive ? '#FFFFFF' : 'var(--text-primary)' }}>
+                              {item.title}
+                            </h4>
+                            <p style={{ fontSize: '0.85rem', color: isNodeActive ? 'rgba(255, 255, 255, 0.85)' : 'var(--text-secondary)', marginTop: '4px' }}>
+                              {item.description}
+                            </p>
+                          </>
                         )}
                       </div>
                     </div>
@@ -1540,72 +1229,17 @@ export default function App() {
           )}
 
           {/* ==========================================
-              TAB: PROGRESS & MILESTONES (Redesigned Goals Section)
+              TAB: PROGRESS (Visual Heatmap Momentum grids for habits and daily plan)
               ========================================== */}
           {activeTab === 'goals' && (
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                <div>
-                  <h1 className="section-title">Progress Sanctuary</h1>
-                  <p className="section-subtitle">Monitor core concentration, habits consistency, and active milestones.</p>
-                </div>
-                <button 
-                  className="btn btn-primary" 
-                  onClick={() => setShowGoalModal(true)}
-                  style={{ padding: '8px 14px', fontSize: '0.85rem' }}
-                >
-                  <Plus size={16} /> Define Milestone
-                </button>
-              </div>
-
-              {/* Progress & Momentum Row */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '12px', marginBottom: '24px' }}>
-                {/* 1. Habit Rate */}
-                <div className="card" style={{ margin: 0, padding: '16px' }}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    Practice Consistency
-                  </span>
-                  <h2 className="serif-font" style={{ fontSize: '1.8rem', marginTop: '4px', display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-                    {habitsRate}% <span style={{ fontSize: '0.85rem', fontFamily: 'var(--font-sans)', fontWeight: 400, color: 'var(--text-secondary)' }}>done</span>
-                  </h2>
-                  <div className="goal-progress-bar" style={{ height: '3px', marginTop: '8px', marginBottom: '4px' }}>
-                    <div className="goal-progress-fill" style={{ width: `${habitsRate}%`, backgroundColor: 'var(--accent-primary)' }} />
-                  </div>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{completedHabitsCount} of {activeHabitsCount} completed today</p>
-                </div>
-
-                {/* 2. Study Hours */}
-                <div className="card" style={{ margin: 0, padding: '16px' }}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    Study Concentration
-                  </span>
-                  <h2 className="serif-font" style={{ fontSize: '1.8rem', marginTop: '4px', display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-                    {currentStudyHrs.toFixed(1)}h <span style={{ fontSize: '0.85rem', fontFamily: 'var(--font-sans)', fontWeight: 400, color: 'var(--text-secondary)' }}>logged</span>
-                  </h2>
-                  <div className="goal-progress-bar" style={{ height: '3px', marginTop: '8px', marginBottom: '4px' }}>
-                    <div className="goal-progress-fill" style={{ width: `${studyRate}%`, backgroundColor: 'var(--accent-primary)' }} />
-                  </div>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Weekly target: {studyTargetHrs} hours</p>
-                </div>
-
-                {/* 3. Goals Rate */}
-                <div className="card" style={{ margin: 0, padding: '16px' }}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    Milestones Conquered
-                  </span>
-                  <h2 className="serif-font" style={{ fontSize: '1.8rem', marginTop: '4px', display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-                    {goalsCompletedCount}/{goalsCount} <span style={{ fontSize: '0.85rem', fontFamily: 'var(--font-sans)', fontWeight: 400, color: 'var(--text-secondary)' }}>achieved</span>
-                  </h2>
-                  <div className="goal-progress-bar" style={{ height: '3px', marginTop: '8px', marginBottom: '4px' }}>
-                    <div className="goal-progress-fill" style={{ width: `${goalsRate}%`, backgroundColor: 'var(--accent-primary)' }} />
-                  </div>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{goalsRate}% success ({completedSub} / {totalSub} steps)</p>
-                </div>
+              <div style={{ marginBottom: '18px' }}>
+                <h1 className="section-title">Progress Sanctuary</h1>
+                <p className="section-subtitle">Monitor your daily habits consistency and daily plan task performance.</p>
               </div>
 
               {/* Heatmaps Sanctuary (GitHub-style Contribution Matrix) */}
               <div style={{ marginBottom: '28px' }}>
-                <h3 className="serif-font" style={{ fontSize: '1.45rem', fontStyle: 'italic', marginBottom: '14px' }}>Task & Habit Momentum</h3>
                 
                 {/* 1. Daily Plan Performance (Tasks Heatmap) */}
                 <div className="card" style={{ marginBottom: '20px' }}>
@@ -1739,75 +1373,6 @@ export default function App() {
                   )}
                 </div>
               </div>
-
-              {/* Goal Filters list */}
-              <div className="goal-filters">
-                <button 
-                  className={`goal-filter-btn ${goalsFilter === 'all' ? 'active' : ''}`}
-                  onClick={() => setGoalsFilter('all')}
-                >
-                  All Milestones
-                </button>
-                <button 
-                  className={`goal-filter-btn ${goalsFilter === 'high' ? 'active' : ''}`}
-                  onClick={() => setGoalsFilter('high')}
-                >
-                  High Priority
-                </button>
-                <button 
-                  className={`goal-filter-btn ${goalsFilter === 'medium' ? 'active' : ''}`}
-                  onClick={() => setGoalsFilter('medium')}
-                >
-                  Medium Priority
-                </button>
-                <button 
-                  className={`goal-filter-btn ${goalsFilter === 'low' ? 'active' : ''}`}
-                  onClick={() => setGoalsFilter('low')}
-                >
-                  Low Priority
-                </button>
-                <button 
-                  className={`goal-filter-btn ${goalsFilter === 'completed' ? 'active' : ''}`}
-                  onClick={() => setGoalsFilter('completed')}
-                >
-                  ✓ Completed
-                </button>
-              </div>
-
-              {/* Main List Grid */}
-              {filteredGoals.length === 0 ? (
-                <div className="card empty-state">
-                  <CheckSquare size={36} />
-                  <p>No active milestones logged. Define projects to maintain structural goals.</p>
-                </div>
-              ) : (
-                <div>
-                  {/* Split Active vs Conquered in 'all' view */}
-                  {goalsFilter === 'all' ? (
-                    <div>
-                      {/* Section: Active */}
-                      {activeGoalsList.length > 0 && (
-                        <div style={{ marginBottom: '24px' }}>
-                          <h3 className="serif-font" style={{ fontSize: '1.2rem', fontStyle: 'italic', marginBottom: '12px' }}>Active Milestones</h3>
-                          {activeGoalsList.map(goal => renderGoalCard(goal))}
-                        </div>
-                      )}
-
-                      {/* Section: Conquered */}
-                      {completedGoalsList.length > 0 && (
-                        <div>
-                          <h3 className="serif-font" style={{ fontSize: '1.2rem', fontStyle: 'italic', marginBottom: '12px', color: 'var(--text-muted)' }}>Conquered Milestones</h3>
-                          {completedGoalsList.map(goal => renderGoalCard(goal))}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div>
-                      {filteredGoals.map(goal => renderGoalCard(goal))}
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
           )}
 
@@ -2008,78 +1573,7 @@ export default function App() {
         </div>
       )}
 
-      {/* 3. Modal: Add Goal */}
-      {showGoalModal && (
-        <div className="modal-overlay" onClick={() => setShowGoalModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3 className="serif-font">Define Milestone</h3>
-              <button className="close-btn" onClick={() => setShowGoalModal(false)}>
-                <X size={20} />
-              </button>
-            </div>
 
-            <form onSubmit={handleAddGoal}>
-              <div className="input-group">
-                <label className="input-label">Milestone Title</label>
-                <input 
-                  type="text" 
-                  className="input-field" 
-                  placeholder="e.g. Deploy React Standalone PWA"
-                  value={newGoalTitle}
-                  onChange={e => setNewGoalTitle(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="input-group" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div>
-                  <label className="input-label">Priority</label>
-                  <select 
-                    className="select-field" 
-                    value={newGoalPriority} 
-                    onChange={e => setNewGoalPriority(e.target.value as any)}
-                  >
-                    <option value="high">High Priority</option>
-                    <option value="medium">Medium Priority</option>
-                    <option value="low">Low Priority</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="input-label">Deadline</label>
-                  <input 
-                    type="date" 
-                    className="input-field" 
-                    value={newGoalDeadline}
-                    onChange={e => setNewGoalDeadline(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="input-group">
-                <label className="input-label">Initial Sub-tasks / Action Steps (one per line)</label>
-                <textarea 
-                  className="textarea-field" 
-                  rows={4} 
-                  placeholder="Add Apple Mobile Web App tags&#10;Define custom CSS layout&#10;Implement local state sync"
-                  value={newGoalSubtasksText}
-                  onChange={e => setNewGoalSubtasksText(e.target.value)}
-                />
-              </div>
-
-              <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowGoalModal(false)} style={{ flexGrow: 1 }}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary" style={{ flexGrow: 2 }}>
-                  Establish Milestone
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
