@@ -1265,3 +1265,78 @@ button, input, select, textarea {
   font-size: 1.1rem;
   font-weight: 700;
 }
+
+/* GitHub-style Contribution Heatmap Grids */
+.contribution-grid-scroll {
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 14px;
+}
+
+.contribution-grid-container {
+  display: flex;
+  gap: 6px;
+  min-width: max-content;
+  padding: 4px;
+}
+
+.contribution-grid-weekdays {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 88px; /* 10px cell + 3px gap * 7 = 88px */
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  padding-top: 2px;
+  width: 12px;
+  text-align: right;
+  margin-right: 4px;
+}
+
+.contribution-grid-columns {
+  display: flex;
+  gap: 3px;
+}
+
+.contribution-grid-column {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.contribution-cell {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background-color: var(--bg-surface); /* Stone warm gray */
+  transition: background-color var(--transition-fast);
+}
+
+/* Habit grid cells completion states */
+.contribution-cell.completed-coral {
+  background-color: #F95C4B !important; /* Coral */
+}
+
+/* Daily task grid completion intensity states (using Black theme) */
+.contribution-cell.task-intensity-none {
+  background-color: var(--bg-surface) !important;
+}
+
+.contribution-cell.task-intensity-low {
+  background-color: #C0AAA5 !important;
+}
+
+.contribution-cell.task-intensity-medium {
+  background-color: #5C5855 !important;
+}
+
+.contribution-cell.task-intensity-high {
+  background-color: #000000 !important;
+}
+
+.contribution-cell.is-future {
+  opacity: 0.25;
+}

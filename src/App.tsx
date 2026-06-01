@@ -147,6 +147,44 @@ const getWeekDates = () => {
 
 
 
+const getContributionGridData = (weeksCount: number = 22) => {
+  const today = new Date();
+  const currentDay = today.getDay(); // 0 is Sun, 1 is Mon...
+  
+  // Get Sunday of the current week
+  const currentSun = new Date(today);
+  currentSun.setDate(today.getDate() - currentDay);
+  
+  // Start from Sunday of the week that is (weeksCount - 1) weeks ago
+  const startDate = new Date(currentSun);
+  startDate.setDate(currentSun.getDate() - (weeksCount - 1) * 7);
+  
+  const grid = [];
+  for (let w = 0; w < weeksCount; w++) {
+    const colDays = [];
+    for (let d = 0; d < 7; d++) {
+      const date = new Date(startDate);
+      date.setDate(startDate.getDate() + (w * 7) + d);
+      
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      const dateStr = `${yyyy}-${mm}-${dd}`;
+      
+      colDays.push({
+        dateStr,
+        dayNum: date.getDate(),
+        monthLabel: date.toLocaleDateString('en-US', { month: 'short' }),
+        isFuture: date.getTime() > today.getTime()
+      });
+    }
+    grid.push(colDays);
+  }
+  return grid;
+};
+
+
+
 interface ScheduleItem {
   id: string;
   title: string;
@@ -1562,6 +1600,143 @@ export default function App() {
                     <div className="goal-progress-fill" style={{ width: `${goalsRate}%`, backgroundColor: 'var(--accent-primary)' }} />
                   </div>
                   <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{goalsRate}% success ({completedSub} / {totalSub} steps)</p>
+                </div>
+              </div>
+
+              {/* Heatmaps Sanctuary (GitHub-style Contribution Matrix) */}
+              <div style={{ marginBottom: '28px' }}>
+                <h3 className="serif-font" style={{ fontSize: '1.45rem', fontStyle: 'italic', marginBottom: '14px' }}>Task & Habit Momentum</h3>
+                
+                {/* 1. Daily Plan Performance (Tasks Heatmap) */}
+                <div className="card" style={{ marginBottom: '20px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
+                    <div>
+                      <h4 className="serif-font" style={{ fontSize: '1.2rem', fontWeight: 600 }}>Daily Plan Performance</h4>
+                      <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                        Tracks your scheduled focus task completion rates over the last 22 weeks.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Heatmap Grid */}
+                  <div className="contribution-grid-scroll">
+                    <div className="contribution-grid-container">
+                      <div className="contribution-grid-weekdays">
+                        <span>S</span>
+                        <span>M</span>
+                        <span>T</span>
+                        <span>W</span>
+                        <span>T</span>
+                        <span>F</span>
+                        <span>S</span>
+                      </div>
+                      <div className="contribution-grid-columns">
+                        {getContributionGridData(22).map((col, colIdx) => (
+                          <div key={colIdx} className="contribution-grid-column">
+                            {col.map((day) => {
+                              // Find all tasks for this date
+                              const dayTasks = dailyTasks.filter(t => (t.date || t.createdAt.split('T')[0]) === day.dateStr);
+                              const total = dayTasks.length;
+                              const completed = dayTasks.filter(t => t.completed).length;
+                              
+                              let intensityClass = 'task-intensity-none';
+                              if (total > 0) {
+                                const ratio = completed / total;
+                                if (ratio === 1) intensityClass = 'task-intensity-high';
+                                else if (ratio >= 0.5) intensityClass = 'task-intensity-medium';
+                                else if (ratio > 0) intensityClass = 'task-intensity-low';
+                              }
+                              
+                              const tooltip = total > 0 
+                                ? `${completed}/${total} tasks done (${Math.round((completed/total)*100)}%)` 
+                                : 'No tasks scheduled';
+
+                              return (
+                                <div 
+                                  key={day.dateStr}
+                                  className={`contribution-cell ${intensityClass} ${day.isFuture ? 'is-future' : ''}`}
+                                  title={`${day.dateStr}: ${tooltip}`}
+                                />
+                              );
+                            })}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Habit blueprints list stack with individual heatmaps (exactly like screenshot!) */}
+                <div>
+                  <h4 className="serif-font" style={{ fontSize: '1.25rem', fontStyle: 'italic', marginBottom: '12px' }}>Habit Blueprints</h4>
+                  {habits.length === 0 ? (
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                      No habits established yet. Start by defining some in the Habits page.
+                    </p>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      {habits.map((habit) => {
+                        const completedDaysCount = habit.history.length;
+                        
+                        return (
+                          <div key={habit.id} className="card" style={{ marginBottom: 0 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
+                              <div>
+                                <h4 className="serif-font" style={{ fontSize: '1.15rem', fontWeight: 600 }}>{habit.name}</h4>
+                                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                                  {habit.description}
+                                </p>
+                              </div>
+                              <div style={{ display: 'flex', gap: '10px', alignItems: 'center', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                {habit.streak > 0 && (
+                                  <span className="habit-streak" style={{ padding: '2px 8px', fontSize: '0.7rem' }}>
+                                    <Flame size={10} fill="currentColor" /> {habit.streak}d streak
+                                  </span>
+                                )}
+                                <span style={{ fontWeight: 600 }}>
+                                  {completedDaysCount}d completed
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Habit Heatmap Grid */}
+                            <div className="contribution-grid-scroll">
+                              <div className="contribution-grid-container">
+                                <div className="contribution-grid-weekdays">
+                                  <span>S</span>
+                                  <span>M</span>
+                                  <span>T</span>
+                                  <span>W</span>
+                                  <span>T</span>
+                                  <span>F</span>
+                                  <span>S</span>
+                                </div>
+                                <div className="contribution-grid-columns">
+                                  {getContributionGridData(22).map((col, colIdx) => (
+                                    <div key={colIdx} className="contribution-grid-column">
+                                      {col.map((day) => {
+                                        const isCompleted = habit.history.includes(day.dateStr);
+                                        const cellClass = isCompleted ? 'completed-coral' : '';
+                                        const tooltip = isCompleted ? 'Completed' : 'Not completed';
+
+                                        return (
+                                          <div 
+                                            key={day.dateStr}
+                                            className={`contribution-cell ${cellClass} ${day.isFuture ? 'is-future' : ''}`}
+                                            title={`${day.dateStr}: ${tooltip}`}
+                                          />
+                                        );
+                                      })}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
 
